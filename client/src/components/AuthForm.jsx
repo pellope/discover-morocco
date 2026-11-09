@@ -21,7 +21,6 @@ export default function AuthForm({ t, lang, onAuthenticated }) {
       onAuthenticated(result);
     } catch (err) {
       setError(err.code);
-    } finally {
       setBusy(false);
     }
   }
@@ -32,29 +31,24 @@ export default function AuthForm({ t, lang, onAuthenticated }) {
   }
 
   return (
-    <div className="auth-layout">
-      <section className="hero">
-        <h1>{t.tagline}</h1>
-        <p>{t.heroText}</p>
-      </section>
+    <form onSubmit={submit}>
+      <div className="segmented">
+        <button type="button" className={mode === 'register' ? 'active' : ''} onClick={() => switchMode('register')}>{t.register}</button>
+        <button type="button" className={mode === 'login' ? 'active' : ''} onClick={() => switchMode('login')}>{t.login}</button>
+      </div>
 
-      <form className="card auth-card" onSubmit={submit}>
-        <div className="segmented">
-          <button type="button" className={mode === 'register' ? 'active' : ''} onClick={() => switchMode('register')}>{t.register}</button>
-          <button type="button" className={mode === 'login' ? 'active' : ''} onClick={() => switchMode('login')}>{t.login}</button>
-        </div>
-
+      <div className="input-group">
         {mode === 'register' && (
-          <label className="field">
+          <label>
             <span>{t.name}</span>
-            <input value={form.name} onChange={set('name')} autoComplete="name" required maxLength={100} />
+            <input value={form.name} onChange={set('name')} autoComplete="name" required maxLength={100} autoFocus />
           </label>
         )}
-        <label className="field">
+        <label>
           <span>{t.email}</span>
           <input type="email" value={form.email} onChange={set('email')} autoComplete="email" required dir="ltr" />
         </label>
-        <label className="field">
+        <label>
           <span>{t.password}</span>
           <input
             type="password"
@@ -65,15 +59,15 @@ export default function AuthForm({ t, lang, onAuthenticated }) {
             minLength={mode === 'register' ? 8 : undefined}
             dir="ltr"
           />
-          {mode === 'register' && <small className="muted">{t.passwordHint}</small>}
         </label>
+      </div>
+      {mode === 'register' && <small className="muted hint">{t.passwordHint}</small>}
 
-        {error && <p className="error" role="alert">{errorText(t, error)}</p>}
+      {error && <p className="error" role="alert">{errorText(t, error)}</p>}
 
-        <button className="btn-primary" disabled={busy}>
-          {mode === 'register' ? t.registerAction : t.loginAction}
-        </button>
-      </form>
-    </div>
+      <button className="btn-primary" disabled={busy}>
+        {mode === 'register' ? t.registerAction : t.loginAction}
+      </button>
+    </form>
   );
 }

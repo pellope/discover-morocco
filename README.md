@@ -37,13 +37,18 @@ npm test
 
 ## Fonctionnement
 
-1. L'utilisateur choisit sa langue et crée un compte.
-2. Il remplit le formulaire : destination, type de voyage, budget, durée, nombre de personnes.
-3. Le Budget Coach calcule le budget par jour et par personne, indique s'il est serré,
-   confortable ou large, et le répartit entre hébergement, transport, repas, activités et imprévus.
-4. Il sauvegarde le voyage et le retrouve dans « Mes voyages ».
+1. La page d'accueil présente les 14 destinations sous forme de cartes, avec des catégories
+   (culture, plage, désert, aventure, gastronomie).
+2. La barre de recherche prend le budget total, la durée et le nombre de voyageurs :
+   les villes qui rentrent dans le budget sont affichées en premier.
+3. La page d'une ville contient la carte « Planifier ce voyage » : le Budget Coach calcule le budget
+   par jour et par personne, indique s'il est serré, confortable ou large, et le répartit entre
+   hébergement, transport, repas, activités et imprévus.
+4. Avec un compte, l'utilisateur sauvegarde ses voyages (« Mes voyages ») et ses villes préférées (« Favoris »).
 
 Les seuils et pourcentages du Budget Coach se règlent dans `server/src/budgetCoach.js`.
+Les villes (noms, descriptions, budget minimum estimé, photo) sont dans `server/src/destinations.js` :
+pour afficher une photo, renseigner le champ `image` avec l'adresse d'une image dont vous avez les droits.
 Les routes de l'API sont décrites dans `server/README.md`.
 
 ## Prochaines étapes

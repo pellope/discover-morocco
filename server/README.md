@@ -21,12 +21,17 @@ Les routes marquées 🔒 exigent l'en-tête `Authorization: Bearer <token>`.
 | POST | `/api/auth/login` | Se connecter `{ email, password }` → `{ user, token }` |
 | GET | `/api/auth/me` 🔒 | Profil de l'utilisateur connecté |
 | PATCH | `/api/auth/me` 🔒 | Changer la langue `{ language }` (`fr`, `en`, `ar`) |
+| GET | `/api/destinations` | Les destinations ; `?type=beach` filtre, `?budget=&days=&people=` ajoute `fits` et trie |
+| GET | `/api/destinations/:id` | Une destination |
+| GET | `/api/favorites` 🔒 | Identifiants des destinations favorites |
+| PUT / DELETE | `/api/favorites/:id` 🔒 | Ajouter / retirer un favori |
 | POST | `/api/budget-coach` | Calculer le Budget Coach sans sauvegarder |
 | GET | `/api/trips` 🔒 | « Mes voyages » |
 | POST | `/api/trips` 🔒 | Sauvegarder un voyage |
 | GET / PUT / DELETE | `/api/trips/:id` 🔒 | Lire, modifier, supprimer un voyage |
 
-Un voyage : `{ destination, tripType, budget, days, people }`, avec `tripType` parmi
+Un voyage : `{ destination, tripType, budget, days, people }`, avec `destination` l'identifiant d'une
+destination et `tripType` parmi
 `culture`, `beach`, `desert`, `adventure`, `gastronomy`. Le budget est en dirhams (MAD).
 Chaque voyage renvoyé contient son `budgetCoach` (`perDay`, `perDayPerPerson`, `level`, `breakdown`).
 

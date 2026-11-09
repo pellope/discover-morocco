@@ -1,4 +1,5 @@
 const { TRIP_TYPES } = require('./budgetCoach');
+const { findDestination } = require('./destinations');
 
 const LANGUAGES = ['fr', 'en', 'ar'];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -38,7 +39,7 @@ function validateTrip(body = {}) {
   const days = Number(body.days);
   const people = Number(body.people);
 
-  if (!destination || destination.length > 100) fail('invalid_destination', 'Destination is required.');
+  if (!findDestination(destination)) fail('invalid_destination', 'Unknown destination.');
   if (!TRIP_TYPES.includes(tripType)) fail('invalid_trip_type', `Trip type must be one of: ${TRIP_TYPES.join(', ')}.`);
   if (!Number.isFinite(budget) || budget <= 0 || budget > 10_000_000) fail('invalid_budget', 'Budget must be a positive number.');
   if (!Number.isInteger(days) || days < 1 || days > 365) fail('invalid_days', 'Days must be an integer between 1 and 365.');

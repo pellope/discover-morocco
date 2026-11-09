@@ -24,6 +24,12 @@ function openDb(file) {
       created_at  TEXT NOT NULL DEFAULT (datetime('now'))
     );
     CREATE INDEX IF NOT EXISTS trips_user ON trips(user_id);
+    CREATE TABLE IF NOT EXISTS favorites (
+      user_id        INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      destination_id TEXT NOT NULL,
+      created_at     TEXT NOT NULL DEFAULT (datetime('now')),
+      PRIMARY KEY (user_id, destination_id)
+    );
   `);
   return db;
 }

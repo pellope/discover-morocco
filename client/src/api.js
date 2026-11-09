@@ -42,6 +42,13 @@ export const api = {
   login: (body) => request('POST', '/auth/login', body),
   me: () => request('GET', '/auth/me'),
   setLanguage: (language) => request('PATCH', '/auth/me', { language }),
+  destinations: (params = {}) => {
+    const query = new URLSearchParams(Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== ''));
+    return request('GET', `/destinations${query.size ? `?${query}` : ''}`);
+  },
+  favorites: () => request('GET', '/favorites'),
+  addFavorite: (id) => request('PUT', `/favorites/${id}`),
+  removeFavorite: (id) => request('DELETE', `/favorites/${id}`),
   budgetCoach: (trip) => request('POST', '/budget-coach', trip),
   listTrips: () => request('GET', '/trips'),
   saveTrip: (trip) => request('POST', '/trips', trip),

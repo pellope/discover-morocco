@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const { authRouter, requireAuth } = require('./routes/auth');
 const { tripsRouter } = require('./routes/trips');
+const { destinationsRouter } = require('./routes/destinations');
+const { favoritesRouter } = require('./routes/favorites');
 const { HttpError, validateTrip } = require('./validation');
 const { computeBudgetCoach } = require('./budgetCoach');
 
@@ -13,7 +15,9 @@ function createApp({ db, jwtSecret, corsOrigin }) {
   app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 
   app.use('/api/auth', authRouter(db, jwtSecret));
+  app.use('/api/destinations', destinationsRouter());
   app.use('/api/trips', requireAuth(db, jwtSecret), tripsRouter(db));
+  app.use('/api/favorites', requireAuth(db, jwtSecret), favoritesRouter(db));
 
   // Calcul du Budget Coach sans compte ni sauvegarde (aperçu du formulaire).
   app.post('/api/budget-coach', (req, res) => {

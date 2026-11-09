@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { cityName, errorText, formatMoney } from '../i18n.js';
+import { errorText, formatMoney } from '../i18n.js';
 import BudgetCoach from './BudgetCoach.jsx';
+import Cover from './Cover.jsx';
 
-export default function MyTrips({ t, lang }) {
+export default function MyTrips({ t, lang, destinations }) {
   const [trips, setTrips] = useState(null);
   const [error, setError] = useState(null);
 
@@ -26,29 +27,38 @@ export default function MyTrips({ t, lang }) {
   if (!trips) return <p className="muted">{t.loading}</p>;
 
   return (
-    <div>
-      <h2>{t.tripsTab}</h2>
+    <>
+      <h1 className="page-title">{t.tripsTab}</h1>
       {error && <p className="error" role="alert">{errorText(t, error)}</p>}
       {trips.length === 0 ? (
-        <p className="muted">{t.noTrips}</p>
+        <div className="empty">
+          <p>{t.noTrips}</p>
+          <a className="btn-primary inline" href="#/">{t.explore}</a>
+        </div>
       ) : (
         <div className="trip-grid">
-          {trips.map((trip) => (
-            <article className="card" key={trip.id}>
-              <div className="trip-head">
-                <div>
-                  <h3>{cityName(trip.destination, lang)}</h3>
-                  <p className="muted">
-                    {t.types[trip.tripType]} · {t.daysCount(trip.days)} · {t.peopleCount(trip.people)} · {formatMoney(trip.budget, lang)}
-                  </p>
+          {trips.map((trip) => {
+            const d = destinations.find((item) => item.id === trip.destination);
+            return (
+              <article className="card trip-card" key={trip.id}>
+                {d && <Cover destination={d} className="trip-cover" />}
+                <div className="trip-body">
+                  <div className="trip-head">
+                    <div>
+                      <h3>{d ? <a href={`#/city/${d.id}`}>{d.name[lang]}</a> : trip.destination}</h3>
+                      <p className="muted">
+                        {t.types[trip.tripType]} · {t.daysCount(trip.days)} · {t.peopleCount(trip.people)} · {formatMoney(trip.budget, lang)}
+                      </p>
+                    </div>
+                    <button className="btn-link danger" onClick={() => remove(trip.id)}>{t.delete}</button>
+                  </div>
+                  <BudgetCoach t={t} lang={lang} coach={trip.budgetCoach} compact />
                 </div>
-                <button className="btn-ghost danger" onClick={() => remove(trip.id)}>{t.delete}</button>
-              </div>
-              <BudgetCoach t={t} lang={lang} coach={trip.budgetCoach} compact />
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -114,3 +114,44 @@ test('public budget coach preview and error shapes', async () => {
   });
   assert.equal(malformed.status, 400);
 });
+
+test('destinations: list, filter by type and budget fit', async () => {
+  const all = await call('GET', '/destinations');
+  assert.equal(all.body.destinations.length, 14);
+
+  const desert = await call('GET', '/destinations?type=desert');
+  assert.deepEqual(desert.body.destinations.map((d) => d.id).sort(), ['Dakhla', 'Merzouga', 'Ouarzazate']);
+
+  // 4000 MAD / 5 jours / 2 personnes = 400 MAD par jour et par personne.
+  const search = await call('GET', '/destinations?budget=4000&days=5&people=2');
+  const fits = search.body.destinations.filter((d) => d.fits).map((d) => d.id);
+  assert.ok(fits.includes('Chefchaouen') && fits.includes('Tangier'));
+  assert.ok(!fits.includes('Marrakech'));
+  assert.equal(search.body.destinations[0].fits, true);
+  assert.equal(search.body.destinations.at(-1).fits, false);
+
+  assert.equal((await call('GET', '/destinations/Fes')).body.destination.name.fr, 'Fès');
+  assert.equal((await call('GET', '/destinations/Paris')).status, 404);
+  assert.equal((await call('GET', '/destinations?type=ski')).status, 400);
+  assert.equal((await call('GET', '/destinations?budget=-5')).status, 400);
+});
+
+test('favorites are per user and idempotent', async () => {
+  const carol = await register('carol@example.com');
+  const dave = await register('dave@example.com');
+  assert.equal((await call('GET', '/favorites')).status, 401);
+
+  await call('PUT', '/favorites/Fes', null, carol);
+  const twice = await call('PUT', '/favorites/Fes', null, carol);
+  assert.deepEqual(twice.body.favorites, ['Fes']);
+  assert.equal((await call('PUT', '/favorites/Paris', null, carol)).status, 404);
+  assert.deepEqual((await call('GET', '/favorites', null, dave)).body.favorites, []);
+
+  const removed = await call('DELETE', '/favorites/Fes', null, carol);
+  assert.deepEqual(removed.body.favorites, []);
+});
+
+test('trips require a known destination', async () => {
+  const token = await register('erin@example.com');
+  assert.equal((await call('POST', '/trips', { ...trip, destination: 'Paris' }, token)).status, 400);
+});
