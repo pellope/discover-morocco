@@ -71,6 +71,11 @@ export default function CityPage({ t, lang, destination, favorites, toggleFavori
           <p className="city-tagline">{d.tagline[lang]}</p>
           <p className="muted">{t.minBudgetNote(formatMoney(d.minDailyBudget, lang))}</p>
 
+          <blockquote className="tip-card">
+            <strong>{t.ourTip}</strong>
+            <p>{d.tip[lang]}</p>
+          </blockquote>
+
           <hr />
           <h2>{t.idealFor}</h2>
           <ul className="type-list">

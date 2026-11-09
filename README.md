@@ -48,7 +48,9 @@ npm test
 
 Les seuils et pourcentages du Budget Coach se règlent dans `server/src/budgetCoach.js`.
 Les villes (noms, descriptions, budget minimum estimé, photo) sont dans `server/src/destinations.js` :
-pour afficher une photo, renseigner le champ `image` avec l'adresse d'une image dont vous avez les droits.
+les photos sont dans `client/public/images/`. Elles viennent de Wikimedia Commons, sous licences libres ;
+leurs auteurs sont cités sur la page « Crédits photos » (`client/src/photoCredits.js`), à compléter si vous
+ajoutez ou remplacez une photo.
 Les routes de l'API sont décrites dans `server/README.md`.
 
 ## Prochaines étapes

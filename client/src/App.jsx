@@ -7,6 +7,8 @@ import Home from './components/Home.jsx';
 import CityPage from './components/CityPage.jsx';
 import MyTrips from './components/MyTrips.jsx';
 import Favorites from './components/Favorites.jsx';
+import Credits from './components/Credits.jsx';
+import Footer from './components/Footer.jsx';
 
 const LANG_KEY = 'dm_lang';
 
@@ -123,8 +125,10 @@ export default function App() {
     page = <MyTrips t={t} lang={lang} destinations={destinations} />;
   } else if (route.page === 'favorites') {
     page = <Favorites {...shared} destinations={destinations} />;
+  } else if (route.page === 'credits') {
+    page = <Credits t={t} lang={lang} destinations={destinations} />;
   } else {
-    page = <Home {...shared} destinations={destinations} search={search} setSearch={setSearch} category={category} setCategory={setCategory} />;
+    page = <Home {...shared} user={user} destinations={destinations} search={search} setSearch={setSearch} category={category} setCategory={setCategory} />;
   }
 
   return (
@@ -133,14 +137,12 @@ export default function App() {
         t={t}
         lang={lang}
         user={user}
-        showSearch={route.page === 'home'}
-        search={search}
-        setSearch={setSearch}
         changeLanguage={changeLanguage}
         openAuth={() => setAuthOpen(true)}
         logout={logout}
       />
       <main className="main">{page}</main>
+      <Footer t={t} />
       {authOpen && <AuthModal t={t} lang={lang} onAuthenticated={onAuthenticated} onClose={() => setAuthOpen(false)} />}
     </>
   );

@@ -25,7 +25,7 @@ export default function SearchBar({ t, search, setSearch }) {
         <input type="number" min="1" step="any" inputMode="decimal" required placeholder={t.searchBudgetPlaceholder} value={form.budget} onChange={set('budget')} />
       </label>
       <label className="search-field">
-        <span>{t.searchDays} ({t.searchDaysUnit})</span>
+        <span>{t.searchDays} <span className="search-unit">({t.searchDaysUnit})</span></span>
         <input type="number" min="1" max="365" step="1" required value={form.days} onChange={set('days')} />
       </label>
       <label className="search-field">

@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { LANGUAGES } from '../i18n.js';
-import SearchBar from './SearchBar.jsx';
 
-export default function Header({ t, lang, user, showSearch, search, setSearch, changeLanguage, openAuth, logout }) {
+export default function Header({ t, lang, user, changeLanguage, openAuth, logout }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -59,12 +58,6 @@ export default function Header({ t, lang, user, showSearch, search, setSearch, c
           </div>
         </div>
       </div>
-
-      {showSearch && (
-        <div className="header-search">
-          <SearchBar t={t} search={search} setSearch={setSearch} />
-        </div>
-      )}
     </header>
   );
 }
