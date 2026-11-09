@@ -155,3 +155,41 @@ test('trips require a known destination', async () => {
   const token = await register('erin@example.com');
   assert.equal((await call('POST', '/trips', { ...trip, destination: 'Paris' }, token)).status, 400);
 });
+
+test('itinerary: one entry per day, within the activities budget, trip type first', async () => {
+  const res = await call('POST', '/budget-coach', trip); // Marrakech, adventure, 6000 MAD, 5 days, 2 people
+  const { itinerary, budgetCoach } = res.body;
+  assert.equal(itinerary.days.length, 5);
+  assert.equal(itinerary.days[0].activities[0].type, 'adventure');
+  assert.ok(itinerary.activitiesPlanned <= budgetCoach.breakdown.activities.amount);
+  assert.equal(itinerary.days[0].activities[0].cost, itinerary.days[0].activities[0].costPerPerson * 2);
+  // 5 activités pour 5 jours : les derniers jours sont libres.
+  assert.equal(itinerary.days.at(-1).activities.length, 0);
+
+  const poor = await call('POST', '/budget-coach', { ...trip, budget: 500 });
+  const paid = poor.body.itinerary.days.flatMap((d) => d.activities).filter((a) => a.cost > poor.body.budgetCoach.breakdown.activities.amount);
+  assert.equal(paid.length, 0);
+});
+
+test('shared trips are readable without an account, by token only', async () => {
+  const token = await register('frank@example.com');
+  const created = await call('POST', '/trips', trip, token);
+  const { shareToken } = created.body.trip;
+  assert.ok(shareToken.length >= 20);
+
+  const shared = await call('GET', `/shared/${shareToken}`);
+  assert.equal(shared.status, 200);
+  assert.equal(shared.body.trip.destination, 'Marrakech');
+  assert.equal(shared.body.trip.sharedBy, 'Test');
+  assert.equal(shared.body.trip.id, undefined);
+  assert.equal(shared.body.trip.itinerary.days.length, 5);
+  assert.equal((await call('GET', '/shared/not-a-real-token')).status, 404);
+
+  await call('DELETE', `/trips/${created.body.trip.id}`, null, token);
+  assert.equal((await call('GET', `/shared/${shareToken}`)).status, 404);
+});
+
+test('destinations carry map coordinates', async () => {
+  const all = await call('GET', '/destinations');
+  assert.ok(all.body.destinations.every((d) => typeof d.lat === 'number' && typeof d.lng === 'number'));
+});

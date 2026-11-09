@@ -4,6 +4,7 @@ import { TYPE_ICONS, errorText, formatMoney } from '../i18n.js';
 import BudgetCoach from './BudgetCoach.jsx';
 import Cover from './Cover.jsx';
 import { HeartButton } from './DestinationCard.jsx';
+import Itinerary from './Itinerary.jsx';
 
 export default function CityPage({ t, lang, destination, favorites, toggleFavorite, search, category, user, requireAuth }) {
   const d = destination;
@@ -13,7 +14,7 @@ export default function CityPage({ t, lang, destination, favorites, toggleFavori
     days: String(search?.days ?? 5),
     people: String(search?.people ?? 2),
   }));
-  const [plan, setPlan] = useState(null); // { trip, coach }
+  const [plan, setPlan] = useState(null); // { trip, coach, itinerary }
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -33,8 +34,8 @@ export default function CityPage({ t, lang, destination, favorites, toggleFavori
   function generate(values = form) {
     const trip = { destination: d.id, tripType: values.tripType, budget: Number(values.budget), days: Number(values.days), people: Number(values.people) };
     return run(async () => {
-      const { budgetCoach } = await api.budgetCoach(trip);
-      setPlan({ trip, coach: budgetCoach });
+      const { budgetCoach, itinerary } = await api.budgetCoach(trip);
+      setPlan({ trip, coach: budgetCoach, itinerary });
       setSaved(false);
     });
   }
@@ -92,6 +93,8 @@ export default function CityPage({ t, lang, destination, favorites, toggleFavori
                 <p className="warning" role="status">{t.belowMinimum(formatMoney(d.minDailyBudget, lang))}</p>
               )}
               <BudgetCoach t={t} lang={lang} coach={plan.coach} />
+              <h2 className="section-gap">{t.itineraryTitle}</h2>
+              <Itinerary t={t} lang={lang} itinerary={plan.itinerary} />
               {saved ? (
                 <p className="success" role="status">✓ {t.saved}</p>
               ) : (

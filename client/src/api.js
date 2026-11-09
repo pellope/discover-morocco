@@ -50,6 +50,7 @@ export const api = {
   addFavorite: (id) => request('PUT', `/favorites/${id}`),
   removeFavorite: (id) => request('DELETE', `/favorites/${id}`),
   budgetCoach: (trip) => request('POST', '/budget-coach', trip),
+  shared: (token) => request('GET', `/shared/${encodeURIComponent(token)}`),
   listTrips: () => request('GET', '/trips'),
   saveTrip: (trip) => request('POST', '/trips', trip),
   deleteTrip: (id) => request('DELETE', `/trips/${id}`),

@@ -31,6 +31,10 @@ function openDb(file) {
       PRIMARY KEY (user_id, destination_id)
     );
   `);
+  // Jeton de partage des voyages (ajouté après la première version de la base).
+  const tripColumns = db.prepare('PRAGMA table_info(trips)').all().map((c) => c.name);
+  if (!tripColumns.includes('share_token')) db.exec('ALTER TABLE trips ADD COLUMN share_token TEXT');
+  db.exec('CREATE UNIQUE INDEX IF NOT EXISTS trips_share_token ON trips(share_token)');
   return db;
 }
 

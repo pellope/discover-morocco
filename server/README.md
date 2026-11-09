@@ -25,7 +25,8 @@ Les routes marquées 🔒 exigent l'en-tête `Authorization: Bearer <token>`.
 | GET | `/api/destinations/:id` | Une destination |
 | GET | `/api/favorites` 🔒 | Identifiants des destinations favorites |
 | PUT / DELETE | `/api/favorites/:id` 🔒 | Ajouter / retirer un favori |
-| POST | `/api/budget-coach` | Calculer le Budget Coach sans sauvegarder |
+| POST | `/api/budget-coach` | Calculer le Budget Coach et le plan jour par jour (`itinerary`) sans sauvegarder |
+| GET | `/api/shared/:token` | Voyage partagé par lien, lisible sans compte |
 | GET | `/api/trips` 🔒 | « Mes voyages » |
 | POST | `/api/trips` 🔒 | Sauvegarder un voyage |
 | GET / PUT / DELETE | `/api/trips/:id` 🔒 | Lire, modifier, supprimer un voyage |

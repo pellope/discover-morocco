@@ -8,6 +8,8 @@ import CityPage from './components/CityPage.jsx';
 import MyTrips from './components/MyTrips.jsx';
 import Favorites from './components/Favorites.jsx';
 import Credits from './components/Credits.jsx';
+import Compare from './components/Compare.jsx';
+import SharedTrip from './components/SharedTrip.jsx';
 import Footer from './components/Footer.jsx';
 
 const LANG_KEY = 'dm_lang';
@@ -125,6 +127,10 @@ export default function App() {
     page = <MyTrips t={t} lang={lang} destinations={destinations} />;
   } else if (route.page === 'favorites') {
     page = <Favorites {...shared} destinations={destinations} />;
+  } else if (route.page === 'compare') {
+    page = <Compare t={t} lang={lang} destinations={destinations} search={search} />;
+  } else if (route.page === 'shared') {
+    page = <SharedTrip key={route.id} t={t} lang={lang} token={route.id} destinations={destinations} />;
   } else if (route.page === 'credits') {
     page = <Credits t={t} lang={lang} destinations={destinations} />;
   } else {

@@ -1,11 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const { authRouter, requireAuth } = require('./routes/auth');
-const { tripsRouter } = require('./routes/trips');
+const { tripsRouter, sharedRouter } = require('./routes/trips');
 const { destinationsRouter } = require('./routes/destinations');
 const { favoritesRouter } = require('./routes/favorites');
 const { HttpError, validateTrip } = require('./validation');
 const { computeBudgetCoach } = require('./budgetCoach');
+const { buildItinerary } = require('./itinerary');
 
 function createApp({ db, jwtSecret, corsOrigin }) {
   const app = express();
@@ -17,11 +18,14 @@ function createApp({ db, jwtSecret, corsOrigin }) {
   app.use('/api/auth', authRouter(db, jwtSecret));
   app.use('/api/destinations', destinationsRouter());
   app.use('/api/trips', requireAuth(db, jwtSecret), tripsRouter(db));
+  app.use('/api/shared', sharedRouter(db));
   app.use('/api/favorites', requireAuth(db, jwtSecret), favoritesRouter(db));
 
   // Calcul du Budget Coach sans compte ni sauvegarde (aperçu du formulaire).
   app.post('/api/budget-coach', (req, res) => {
-    res.json({ budgetCoach: computeBudgetCoach(validateTrip(req.body)) });
+    const trip = validateTrip(req.body);
+    const budgetCoach = computeBudgetCoach(trip);
+    res.json({ budgetCoach, itinerary: buildItinerary(trip, budgetCoach) });
   });
 
   app.use((_req, _res, next) => next(new HttpError(404, 'not_found', 'Route not found.')));

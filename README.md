@@ -44,10 +44,15 @@ npm test
 3. La page d'une ville contient la carte « Planifier ce voyage » : le Budget Coach calcule le budget
    par jour et par personne, indique s'il est serré, confortable ou large, et le répartit entre
    hébergement, transport, repas, activités et imprévus.
-4. Avec un compte, l'utilisateur sauvegarde ses voyages (« Mes voyages ») et ses villes préférées (« Favoris »).
+4. Le plan jour par jour propose des activités avec leur coût estimé, sans dépasser la part « activités ».
+5. Avec un compte, l'utilisateur sauvegarde ses voyages (« Mes voyages ») et ses villes préférées (« Favoris »),
+   et partage un voyage par lien (visible sans compte).
+6. « Carte » affiche les villes sur une carte du Maroc ; « Comparer deux villes » montre ce que le même
+   budget permet dans deux destinations.
 
 Les seuils et pourcentages du Budget Coach se règlent dans `server/src/budgetCoach.js`.
-Les villes (noms, descriptions, budget minimum estimé, photo) sont dans `server/src/destinations.js` :
+Les villes (noms, descriptions, budget minimum estimé, photo) sont dans `server/src/destinations.js`,
+les activités et leurs prix estimés dans `server/src/activities.js` :
 les photos sont dans `client/public/images/`. Elles viennent de Wikimedia Commons, sous licences libres ;
 leurs auteurs sont cités sur la page « Crédits photos » (`client/src/photoCredits.js`), à compléter si vous
 ajoutez ou remplacez une photo.
@@ -57,5 +62,3 @@ Les routes de l'API sont décrites dans `server/README.md`.
 
 - Connexion avec Google
 - API Google Places (hôtels, restaurants, activités)
-- Plan jour par jour avec les coûts
-- Carte des étapes

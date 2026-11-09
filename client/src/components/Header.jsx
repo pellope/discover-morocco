@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { LANGUAGES } from '../i18n.js';
+import Logo from './Logo.jsx';
 
 export default function Header({ t, lang, user, changeLanguage, openAuth, logout }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -24,7 +25,8 @@ export default function Header({ t, lang, user, changeLanguage, openAuth, logout
     <header className="header">
       <div className="header-inner">
         <a className="brand" href="#/">
-          <span className="brand-mark" aria-hidden="true">✦</span> Discover Morocco
+          <Logo />
+          <span className="brand-name">Discover <b>Morocco</b></span>
         </a>
 
         <div className="header-actions">
@@ -44,6 +46,7 @@ export default function Header({ t, lang, user, changeLanguage, openAuth, logout
                     <div className="menu-user">{user.name}</div>
                     <button onClick={() => go('#/trips')}>{t.tripsTab}</button>
                     <button onClick={() => go('#/favorites')}>{t.favoritesTab}</button>
+                    <button onClick={() => go('#/compare')}>{t.compareTab}</button>
                     <hr />
                     <button onClick={() => { setMenuOpen(false); logout(); }}>{t.logout}</button>
                   </>
@@ -51,6 +54,8 @@ export default function Header({ t, lang, user, changeLanguage, openAuth, logout
                   <>
                     <button className="strong" onClick={() => { setMenuOpen(false); openAuth(); }}>{t.register}</button>
                     <button onClick={() => { setMenuOpen(false); openAuth(); }}>{t.login}</button>
+                    <hr />
+                    <button onClick={() => go('#/compare')}>{t.compareTab}</button>
                   </>
                 )}
               </div>

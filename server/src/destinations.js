@@ -4,7 +4,7 @@
 
 const DESTINATIONS = [
   {
-    id: 'Marrakech', types: ['culture', 'gastronomy', 'adventure'], minDailyBudget: 450, color: '#c1272d', image: '/images/Marrakech.jpg',
+    id: 'Marrakech', lat: 31.6295, lng: -7.9811, types: ['culture', 'gastronomy', 'adventure'], minDailyBudget: 450, color: '#c1272d', image: '/images/Marrakech.jpg',
     name: { fr: 'Marrakech', en: 'Marrakech', ar: 'مراكش' },
     tagline: {
       fr: 'Souks, palais et la place Jemaa el-Fna au pied de l’Atlas',
@@ -13,7 +13,7 @@ const DESTINATIONS = [
     },
   },
   {
-    id: 'Fes', types: ['culture', 'gastronomy'], minDailyBudget: 350, color: '#1d6fa5', image: '/images/Fes.jpg',
+    id: 'Fes', lat: 34.0181, lng: -5.0078, types: ['culture', 'gastronomy'], minDailyBudget: 350, color: '#1d6fa5', image: '/images/Fes.jpg',
     name: { fr: 'Fès', en: 'Fez', ar: 'فاس' },
     tagline: {
       fr: 'La plus grande médina du monde et ses tanneries',
@@ -22,7 +22,7 @@ const DESTINATIONS = [
     },
   },
   {
-    id: 'Casablanca', types: ['culture', 'gastronomy', 'beach'], minDailyBudget: 500, color: '#3d6b8c', image: '/images/Casablanca.jpg',
+    id: 'Casablanca', lat: 33.5731, lng: -7.5898, types: ['culture', 'gastronomy', 'beach'], minDailyBudget: 500, color: '#3d6b8c', image: '/images/Casablanca.jpg',
     name: { fr: 'Casablanca', en: 'Casablanca', ar: 'الدار البيضاء' },
     tagline: {
       fr: 'La mosquée Hassan II, l’Art déco et la corniche',
@@ -31,7 +31,7 @@ const DESTINATIONS = [
     },
   },
   {
-    id: 'Rabat', types: ['culture', 'beach'], minDailyBudget: 450, color: '#2f7d6b', image: '/images/Rabat.jpg',
+    id: 'Rabat', lat: 34.0209, lng: -6.8416, types: ['culture', 'beach'], minDailyBudget: 450, color: '#2f7d6b', image: '/images/Rabat.jpg',
     name: { fr: 'Rabat', en: 'Rabat', ar: 'الرباط' },
     tagline: {
       fr: 'La capitale : kasbah des Oudayas et tour Hassan',
@@ -40,7 +40,7 @@ const DESTINATIONS = [
     },
   },
   {
-    id: 'Tangier', types: ['culture', 'beach'], minDailyBudget: 400, color: '#2a7fa8', image: '/images/Tangier.jpg',
+    id: 'Tangier', lat: 35.7595, lng: -5.834, types: ['culture', 'beach'], minDailyBudget: 400, color: '#2a7fa8', image: '/images/Tangier.jpg',
     name: { fr: 'Tanger', en: 'Tangier', ar: 'طنجة' },
     tagline: {
       fr: 'Entre Méditerranée et Atlantique, face à l’Espagne',
@@ -49,7 +49,7 @@ const DESTINATIONS = [
     },
   },
   {
-    id: 'Chefchaouen', types: ['culture', 'adventure'], minDailyBudget: 300, color: '#3b82c4', image: '/images/Chefchaouen.jpg',
+    id: 'Chefchaouen', lat: 35.1688, lng: -5.2636, types: ['culture', 'adventure'], minDailyBudget: 300, color: '#3b82c4', image: '/images/Chefchaouen.jpg',
     name: { fr: 'Chefchaouen', en: 'Chefchaouen', ar: 'شفشاون' },
     tagline: {
       fr: 'La ville bleue nichée dans les montagnes du Rif',
@@ -58,7 +58,7 @@ const DESTINATIONS = [
     },
   },
   {
-    id: 'Agadir', types: ['beach', 'adventure'], minDailyBudget: 450, color: '#d98a00', image: '/images/Agadir.jpg',
+    id: 'Agadir', lat: 30.4278, lng: -9.5981, types: ['beach', 'adventure'], minDailyBudget: 450, color: '#d98a00', image: '/images/Agadir.jpg',
     name: { fr: 'Agadir', en: 'Agadir', ar: 'أكادير' },
     tagline: {
       fr: 'Grande plage, soleil toute l’année et surf à Taghazout',
@@ -67,7 +67,7 @@ const DESTINATIONS = [
     },
   },
   {
-    id: 'Essaouira', types: ['beach', 'gastronomy', 'culture'], minDailyBudget: 350, color: '#4a8fa3', image: '/images/Essaouira.jpg',
+    id: 'Essaouira', lat: 31.5085, lng: -9.7595, types: ['beach', 'gastronomy', 'culture'], minDailyBudget: 350, color: '#4a8fa3', image: '/images/Essaouira.jpg',
     name: { fr: 'Essaouira', en: 'Essaouira', ar: 'الصويرة' },
     tagline: {
       fr: 'Remparts, port de pêche et poisson grillé face à l’océan',
@@ -76,7 +76,7 @@ const DESTINATIONS = [
     },
   },
   {
-    id: 'Merzouga', types: ['desert', 'adventure'], minDailyBudget: 500, color: '#c96f2b', image: '/images/Merzouga.jpg',
+    id: 'Merzouga', lat: 31.0802, lng: -4.0134, types: ['desert', 'adventure'], minDailyBudget: 500, color: '#c96f2b', image: '/images/Merzouga.jpg',
     name: { fr: 'Merzouga', en: 'Merzouga', ar: 'مرزوكة' },
     tagline: {
       fr: 'Les dunes de l’erg Chebbi et les nuits en bivouac',
@@ -85,7 +85,7 @@ const DESTINATIONS = [
     },
   },
   {
-    id: 'Ouarzazate', types: ['desert', 'culture', 'adventure'], minDailyBudget: 350, color: '#b5651d', image: '/images/Ouarzazate.jpg',
+    id: 'Ouarzazate', lat: 30.9189, lng: -6.8934, types: ['desert', 'culture', 'adventure'], minDailyBudget: 350, color: '#b5651d', image: '/images/Ouarzazate.jpg',
     name: { fr: 'Ouarzazate', en: 'Ouarzazate', ar: 'ورزازات' },
     tagline: {
       fr: 'Porte du désert, kasbahs et studios de cinéma',
@@ -94,7 +94,7 @@ const DESTINATIONS = [
     },
   },
   {
-    id: 'Meknes', types: ['culture', 'gastronomy'], minDailyBudget: 300, color: '#7a8b3a', image: '/images/Meknes.jpg',
+    id: 'Meknes', lat: 33.8935, lng: -5.5473, types: ['culture', 'gastronomy'], minDailyBudget: 300, color: '#7a8b3a', image: '/images/Meknes.jpg',
     name: { fr: 'Meknès', en: 'Meknes', ar: 'مكناس' },
     tagline: {
       fr: 'Ville impériale, Bab Mansour et les ruines de Volubilis',
@@ -103,7 +103,7 @@ const DESTINATIONS = [
     },
   },
   {
-    id: 'Tetouan', types: ['culture', 'beach'], minDailyBudget: 300, color: '#5b8f7b', image: '/images/Tetouan.jpg',
+    id: 'Tetouan', lat: 35.5889, lng: -5.3626, types: ['culture', 'beach'], minDailyBudget: 300, color: '#5b8f7b', image: '/images/Tetouan.jpg',
     name: { fr: 'Tétouan', en: 'Tetouan', ar: 'تطوان' },
     tagline: {
       fr: 'Médina andalouse et plages de la Méditerranée',
@@ -112,7 +112,7 @@ const DESTINATIONS = [
     },
   },
   {
-    id: 'Dakhla', types: ['beach', 'desert', 'adventure'], minDailyBudget: 600, color: '#1f9aa8', image: '/images/Dakhla.jpg',
+    id: 'Dakhla', lat: 23.6848, lng: -15.958, types: ['beach', 'desert', 'adventure'], minDailyBudget: 600, color: '#1f9aa8', image: '/images/Dakhla.jpg',
     name: { fr: 'Dakhla', en: 'Dakhla', ar: 'الداخلة' },
     tagline: {
       fr: 'Lagune, kitesurf et désert qui rejoint l’océan',
@@ -121,7 +121,7 @@ const DESTINATIONS = [
     },
   },
   {
-    id: 'Ifrane', types: ['adventure'], minDailyBudget: 400, color: '#3f7d4e', image: '/images/Ifrane.jpg',
+    id: 'Ifrane', lat: 33.5228, lng: -5.1106, types: ['adventure'], minDailyBudget: 400, color: '#3f7d4e', image: '/images/Ifrane.jpg',
     name: { fr: 'Ifrane', en: 'Ifrane', ar: 'إفران' },
     tagline: {
       fr: 'Forêts de cèdres, lacs et neige du Moyen Atlas',
