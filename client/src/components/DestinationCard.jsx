@@ -17,6 +17,16 @@ export function HeartButton({ t, active, onClick, className = '' }) {
   );
 }
 
+// Note moyenne d'une ville, affichée seulement s'il existe au moins un avis.
+export function Rating({ t, rating }) {
+  if (!rating || rating.count === 0) return null;
+  return (
+    <span className="rating" title={t.starsLabel(rating.average)}>
+      <span aria-hidden="true">★</span> {rating.average} <span className="muted">({t.reviewsCount(rating.count)})</span>
+    </span>
+  );
+}
+
 export default function DestinationCard({ t, lang, destination, isFavorite, toggleFavorite }) {
   const d = destination;
   return (
@@ -29,7 +39,10 @@ export default function DestinationCard({ t, lang, destination, isFavorite, togg
         <HeartButton t={t} active={isFavorite} onClick={() => toggleFavorite(d.id)} className="on-cover" />
       </div>
       <div className="dest-body">
-        <h3>{d.name[lang]}</h3>
+        <div className="dest-title">
+          <h3>{d.name[lang]}</h3>
+          <Rating t={t} rating={d.rating} />
+        </div>
         <p className="muted dest-types">{d.types.map((type) => t.types[type]).join(' · ')}</p>
         <p className="muted dest-tagline">{d.tagline[lang]}</p>
         <p className="dest-price">

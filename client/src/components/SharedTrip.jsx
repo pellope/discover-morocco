@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { errorText, formatMoney } from '../i18n.js';
-import BudgetCoach from './BudgetCoach.jsx';
+import { errorText } from '../i18n.js';
 import Cover from './Cover.jsx';
-import Itinerary from './Itinerary.jsx';
+import PlanResult from './PlanResult.jsx';
+import { tripSummary, tripTitle } from './TripPage.jsx';
 
 // Page publique d'un voyage partagé par lien.
 export default function SharedTrip({ t, lang, token, destinations }) {
@@ -24,25 +24,17 @@ export default function SharedTrip({ t, lang, token, destinations }) {
   }
   if (!trip) return <p className="muted">{t.loading}</p>;
 
-  const d = destinations.find((item) => item.id === trip.destination);
+  const cover = destinations.find((d) => d.id === trip.destination);
   return (
     <article className="shared">
-      <h1 className="page-title">{t.sharedTitle(trip.sharedBy, d.name[lang])}</h1>
-      <p className="lead">
-        {t.types[trip.tripType]} · {t.daysCount(trip.days)} · {t.peopleCount(trip.people)} · {formatMoney(trip.budget, lang)}
-      </p>
-      <Cover destination={d} className="city-cover" />
-      <div className="shared-layout">
-        <section className="card">
-          <h2>{t.coachTitle}</h2>
-          <BudgetCoach t={t} lang={lang} coach={trip.budgetCoach} />
-        </section>
-        <section className="card">
-          <h2>{t.itineraryTitle}</h2>
-          <Itinerary t={t} lang={lang} itinerary={trip.itinerary} />
-        </section>
-      </div>
-      <a className="btn-primary inline" href={`#/city/${d.id}`}>{t.sharedCta}</a>
+      <h1 className="page-title">{t.sharedTitle(trip.sharedBy, tripTitle(trip, destinations, lang))}</h1>
+      <p className="lead">{tripSummary(trip, t, lang)}</p>
+      {cover && <Cover destination={cover} className="city-cover" />}
+      <section className="card shared-plan">
+        <h2>{t.coachTitle}</h2>
+        <PlanResult t={t} lang={lang} plan={trip} destinations={destinations} />
+      </section>
+      <a className="btn-primary inline" href={trip.stops.length > 1 ? '#/circuit' : `#/city/${trip.destination}`}>{t.sharedCta}</a>
     </article>
   );
 }

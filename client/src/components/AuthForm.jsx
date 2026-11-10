@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { api } from '../api.js';
 import { errorText } from '../i18n.js';
+import GoogleButton from './GoogleButton.jsx';
 
-export default function AuthForm({ t, lang, onAuthenticated }) {
+export default function AuthForm({ t, lang, googleClientId, onAuthenticated }) {
   const [mode, setMode] = useState('register');
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState(null);
@@ -24,6 +25,15 @@ export default function AuthForm({ t, lang, onAuthenticated }) {
       setBusy(false);
     }
   }
+
+  const onGoogle = useCallback(async (credential) => {
+    setError(null);
+    try {
+      onAuthenticated(await api.google(credential, lang));
+    } catch (err) {
+      setError(err.code);
+    }
+  }, [lang, onAuthenticated]);
 
   function switchMode(next) {
     setMode(next);
@@ -68,6 +78,13 @@ export default function AuthForm({ t, lang, onAuthenticated }) {
       <button className="btn-primary" disabled={busy}>
         {mode === 'register' ? t.registerAction : t.loginAction}
       </button>
+
+      {googleClientId && (
+        <>
+          <p className="divider"><span>{t.or}</span></p>
+          <GoogleButton clientId={googleClientId} lang={lang} onCredential={onGoogle} />
+        </>
+      )}
     </form>
   );
 }

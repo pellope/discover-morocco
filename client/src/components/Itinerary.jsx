@@ -1,33 +1,105 @@
-import { TYPE_ICONS, formatMoney } from '../i18n.js';
+import { useState } from 'react';
+import { TYPE_ICONS, activityName, formatDate, formatMoney } from '../i18n.js';
 
-// Plan jour par jour calculé par le serveur.
-export default function Itinerary({ t, lang, itinerary }) {
+// Formulaire d'ajout d'une activité à un jour (mode modification).
+function AddActivity({ t, onAdd }) {
+  const [name, setName] = useState('');
+  const [cost, setCost] = useState('');
+  function submit(e) {
+    e.preventDefault();
+    if (!name.trim()) return;
+    onAdd({ name: name.trim(), type: 'custom', cost: Number(cost) || 0 });
+    setName('');
+    setCost('');
+  }
+  return (
+    <form className="add-activity" onSubmit={submit}>
+      <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t.activityName} aria-label={t.activityName} maxLength={120} />
+      <input type="number" min="0" step="any" value={cost} onChange={(e) => setCost(e.target.value)} placeholder={t.activityCost} aria-label={t.activityCost} />
+      <button className="btn-small">{t.addActivity}</button>
+    </form>
+  );
+}
+
+// Plan jour par jour calculé par le serveur. Avec onChange, chaque activité peut être
+// déplacée au jour précédent ou suivant, retirée, et on peut en ajouter.
+export default function Itinerary({ t, lang, itinerary, destinations, onChange }) {
+  const cityName = (id) => destinations?.find((d) => d.id === id)?.name[lang] ?? id;
+  const multiCity = new Set(itinerary.days.map((d) => d.destination)).size > 1;
+  const editing = Boolean(onChange);
+
+  // Renvoie une copie du plan (une liste d'activités par jour) après une modification.
+  function update(change) {
+    const days = itinerary.days.map((d) => d.activities.map((a) => ({ name: a.name, type: a.type, cost: a.cost })));
+    change(days);
+    onChange(days);
+  }
+  const move = (dayIndex, activityIndex, delta) => update((days) => {
+    const [activity] = days[dayIndex].splice(activityIndex, 1);
+    days[dayIndex + delta].push(activity);
+  });
+  const remove = (dayIndex, activityIndex) => update((days) => { days[dayIndex].splice(activityIndex, 1); });
+  const add = (dayIndex, activity) => update((days) => { days[dayIndex].push(activity); });
+
   return (
     <div className="itinerary">
+      {itinerary.legs.length > 0 && (
+        <div className="legs">
+          <h3>{t.transferTitle}</h3>
+          <ul>
+            {itinerary.legs.map((leg) => (
+              <li key={`${leg.from}-${leg.to}`}>
+                <span>{t.legLine(cityName(leg.from), cityName(leg.to), leg.km)}</span>
+                <span className="price">{formatMoney(leg.cost, lang)}</span>
+              </li>
+            ))}
+          </ul>
+          <p className={itinerary.legsCost > itinerary.transportBudget ? 'warning' : 'muted'}>
+            {itinerary.legsCost > itinerary.transportBudget
+              ? t.legsOver
+              : t.legsNote(formatMoney(itinerary.legsCost, lang), formatMoney(itinerary.transportBudget, lang))}
+          </p>
+        </div>
+      )}
+
       <ol className="days">
-        {itinerary.days.map((day) => (
+        {itinerary.days.map((day, dayIndex) => (
           <li key={day.day} className="day">
-            <span className="day-badge">{t.dayLabel(day.day)}</span>
+            <div className="day-head">
+              <span className="day-badge">{t.dayLabel(day.day)}</span>
+              {day.date && <span className="muted">{formatDate(day.date, lang)}</span>}
+              {multiCity && <strong className="day-city">{cityName(day.destination)}</strong>}
+            </div>
             {day.activities.length === 0 ? (
               <p className="muted day-free">{t.freeDay}</p>
             ) : (
               <ul className="day-activities">
-                {day.activities.map((activity) => (
-                  <li key={activity.name.fr}>
-                    <span aria-hidden="true">{TYPE_ICONS[activity.type]}</span>
-                    <span className="day-activity-name">{activity.name[lang]}</span>
+                {day.activities.map((activity, activityIndex) => (
+                  <li key={`${activityName(activity.name, 'fr')}-${activityIndex}`}>
+                    <span aria-hidden="true">{TYPE_ICONS[activity.type] ?? TYPE_ICONS.custom}</span>
+                    <span className="day-activity-name">{activityName(activity.name, lang)}</span>
                     <span className={activity.cost === 0 ? 'price free' : 'price'}>
                       {activity.cost === 0 ? t.free : formatMoney(activity.cost, lang)}
                     </span>
+                    {editing && (
+                      <span className="activity-tools">
+                        <button className="tool" onClick={() => move(dayIndex, activityIndex, -1)} disabled={dayIndex === 0} aria-label={t.moveUp} title={t.moveUp}>↑</button>
+                        <button className="tool" onClick={() => move(dayIndex, activityIndex, 1)} disabled={dayIndex === itinerary.days.length - 1} aria-label={t.moveDown} title={t.moveDown}>↓</button>
+                        <button className="tool danger" onClick={() => remove(dayIndex, activityIndex)} aria-label={t.remove} title={t.remove}>✕</button>
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>
             )}
+            {editing && <AddActivity t={t} onAdd={(activity) => add(dayIndex, activity)} />}
             <p className="muted day-total">{t.dayEstimate} : <strong>{formatMoney(day.total, lang)}</strong></p>
           </li>
         ))}
       </ol>
-      <p className="muted">{t.itineraryNote(formatMoney(itinerary.activitiesPlanned, lang), formatMoney(itinerary.activitiesBudget, lang))}</p>
+      <p className={itinerary.activitiesPlanned > itinerary.activitiesBudget ? 'warning' : 'muted'}>
+        {t.itineraryNote(formatMoney(itinerary.activitiesPlanned, lang), formatMoney(itinerary.activitiesBudget, lang))}
+      </p>
     </div>
   );
 }

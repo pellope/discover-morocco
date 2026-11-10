@@ -2,7 +2,7 @@ import { CREDITS } from '../photoCredits.js';
 
 // Auteurs et licences des photos (obligatoire pour les licences Creative Commons).
 export default function Credits({ t, lang, destinations }) {
-  const label = (id) => destinations.find((d) => d.id === id)?.name[lang] ?? 'Discover Morocco';
+  const label = (id) => destinations.find((d) => d.id === id.split('-')[0])?.name[lang] ?? 'Discover Morocco';
   return (
     <>
       <h1 className="page-title">{t.photoCredits}</h1>

@@ -1,3 +1,5 @@
+import { EXTRA } from './i18n2.js';
+
 export const LANGUAGES = [
   { code: 'fr', label: 'Français' },
   { code: 'en', label: 'English' },
@@ -6,7 +8,7 @@ export const LANGUAGES = [
 
 export const TRIP_TYPES = ['culture', 'beach', 'desert', 'adventure', 'gastronomy'];
 
-export const TYPE_ICONS = { all: '🧭', culture: '🕌', beach: '🏖️', desert: '🏜️', adventure: '⛰️', gastronomy: '🍲' };
+export const TYPE_ICONS = { custom: '📌', all: '🧭', culture: '🕌', beach: '🏖️', desert: '🏜️', adventure: '⛰️', gastronomy: '🍲' };
 
 const translations = {
   fr: {
@@ -392,11 +394,39 @@ const translations = {
   },
 };
 
-export const getT = (lang) => translations[lang] ?? translations.fr;
+const merged = {};
+export function getT(lang) {
+  const code = translations[lang] ? lang : 'fr';
+  if (!merged[code]) {
+    merged[code] = { ...translations[code], ...EXTRA[code], errors: { ...translations[code].errors, ...EXTRA[code].extraErrors } };
+  }
+  return merged[code];
+}
 
 export const errorText = (t, code) => t.errors[code] ?? t.errors.default;
 
+// Devise d'affichage. Les montants sont stockés en dirhams et convertis avec des taux approximatifs.
+export const CURRENCIES = ['MAD', 'EUR', 'USD'];
+let currency = 'MAD';
+let rates = { MAD: 1, EUR: 10.8, USD: 10 };
+export function setCurrency(code, newRates) {
+  if (newRates) rates = newRates;
+  currency = CURRENCIES.includes(code) ? code : 'MAD';
+}
+
 export function formatMoney(amount, lang) {
   const locale = { fr: 'fr-FR', en: 'en-US', ar: 'ar-MA' }[lang] ?? 'fr-FR';
-  return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(amount)} ${lang === 'ar' ? 'درهم' : 'MAD'}`;
+  const value = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(amount / rates[currency]);
+  if (currency === 'EUR') return value + ' €';
+  if (currency === 'USD') return '$' + value;
+  return value + ' ' + (lang === 'ar' ? 'درهم' : 'MAD');
+}
+
+// Nom d'une activité : traduit pour les activités proposées, texte libre pour celles de l'utilisateur.
+export const activityName = (name, lang) => (typeof name === 'string' ? name : name[lang] ?? name.fr);
+
+export function formatDate(iso, lang) {
+  const locale = { fr: 'fr-FR', en: 'en-GB', ar: 'ar-MA' }[lang] ?? 'fr-FR';
+  const date = new Date(iso + 'T00:00:00Z');
+  return new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }).format(date);
 }

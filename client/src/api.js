@@ -37,21 +37,37 @@ async function request(method, path, body) {
   return data;
 }
 
+const query = (params) => {
+  const search = new URLSearchParams(Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== ''));
+  return search.size ? '?' + search : '';
+};
+
 export const api = {
+  config: () => request('GET', '/config'),
   register: (body) => request('POST', '/auth/register', body),
   login: (body) => request('POST', '/auth/login', body),
+  google: (credential, language) => request('POST', '/auth/google', { credential, language }),
   me: () => request('GET', '/auth/me'),
+  updateMe: (body) => request('PATCH', '/auth/me', body),
   setLanguage: (language) => request('PATCH', '/auth/me', { language }),
-  destinations: (params = {}) => {
-    const query = new URLSearchParams(Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== ''));
-    return request('GET', `/destinations${query.size ? `?${query}` : ''}`);
-  },
+  changePassword: (currentPassword, newPassword) => request('POST', '/auth/password', { currentPassword, newPassword }),
+  deleteAccount: (password) => request('DELETE', '/auth/me', { password }),
+  destinations: (params = {}) => request('GET', '/destinations' + query(params)),
+  reviews: (id) => request('GET', '/destinations/' + id + '/reviews'),
+  saveReview: (id, body) => request('PUT', '/destinations/' + id + '/review', body),
+  deleteReview: (id) => request('DELETE', '/destinations/' + id + '/review'),
   favorites: () => request('GET', '/favorites'),
-  addFavorite: (id) => request('PUT', `/favorites/${id}`),
-  removeFavorite: (id) => request('DELETE', `/favorites/${id}`),
-  budgetCoach: (trip) => request('POST', '/budget-coach', trip),
-  shared: (token) => request('GET', `/shared/${encodeURIComponent(token)}`),
+  addFavorite: (id) => request('PUT', '/favorites/' + id),
+  removeFavorite: (id) => request('DELETE', '/favorites/' + id),
+  plan: (trip) => request('POST', '/budget-coach', trip),
+  shared: (token) => request('GET', '/shared/' + encodeURIComponent(token)),
   listTrips: () => request('GET', '/trips'),
+  getTrip: (id) => request('GET', '/trips/' + id),
   saveTrip: (trip) => request('POST', '/trips', trip),
-  deleteTrip: (id) => request('DELETE', `/trips/${id}`),
+  deleteTrip: (id) => request('DELETE', '/trips/' + id),
+  savePlan: (id, days) => request('PUT', '/trips/' + id + '/plan', { days }),
+  expenses: (id) => request('GET', '/trips/' + id + '/expenses'),
+  addExpense: (id, body) => request('POST', '/trips/' + id + '/expenses', body),
+  deleteExpense: (id, expenseId) => request('DELETE', '/trips/' + id + '/expenses/' + expenseId),
+  saveTravelers: (id, travelers) => request('PUT', '/trips/' + id + '/travelers', { travelers }),
 };

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import AuthForm from './AuthForm.jsx';
 
-export default function AuthModal({ t, lang, onAuthenticated, onClose }) {
+export default function AuthModal({ t, lang, googleClientId, onAuthenticated, onClose }) {
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
@@ -22,7 +22,7 @@ export default function AuthModal({ t, lang, onAuthenticated, onClose }) {
         <div className="modal-body">
           <h2 id="auth-title">{t.authTitle}</h2>
           <p className="muted">{t.authReason}</p>
-          <AuthForm t={t} lang={lang} onAuthenticated={onAuthenticated} />
+          <AuthForm t={t} lang={lang} googleClientId={googleClientId} onAuthenticated={onAuthenticated} />
         </div>
       </div>
     </div>

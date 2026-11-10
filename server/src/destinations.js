@@ -206,6 +206,82 @@ const TIPS = {
 };
 DESTINATIONS.forEach((d) => { d.tip = TIPS[d.id]; });
 
+// Climat (température maximale moyenne par mois, en °C, de janvier à décembre), meilleurs mois,
+// mois de haute saison (budget minimum majoré) et accès. Valeurs approximatives.
+const DETAILS = {
+  Marrakech: { climate: [18, 20, 23, 25, 29, 33, 37, 37, 32, 28, 22, 19], bestMonths: [3, 4, 5, 10, 11], peakMonths: [3, 4, 10, 12], getThere: { fr: "Aéroport international de Marrakech-Ménara ; train depuis Casablanca (environ 2 h 40) et Rabat.", en: "Marrakech-Menara international airport; train from Casablanca (about 2 h 40) and Rabat.", ar: "مطار مراكش المنارة الدولي، والقطار من الدار البيضاء (حوالي ساعتين و40 دقيقة) والرباط." } },
+  Fes: { climate: [15, 17, 20, 22, 26, 31, 35, 35, 30, 25, 19, 16], bestMonths: [4, 5, 9, 10], peakMonths: [4, 5, 10], getThere: { fr: "Aéroport de Fès-Saïss ; train depuis Rabat, Casablanca, Meknès et Tanger.", en: "Fes-Saïss airport; train from Rabat, Casablanca, Meknes and Tangier.", ar: "مطار فاس سايس، والقطار من الرباط والدار البيضاء ومكناس وطنجة." } },
+  Casablanca: { climate: [17, 18, 19, 21, 22, 25, 26, 27, 26, 24, 21, 18], bestMonths: [5, 6, 9, 10], peakMonths: [7, 8], getThere: { fr: "Aéroport Mohammed V, le plus grand du pays, relié au centre en train ; TGV Al Boraq depuis Tanger.", en: "Mohammed V airport, the country’s largest, linked to the centre by train; Al Boraq high-speed train from Tangier.", ar: "مطار محمد الخامس، الأكبر في البلاد، مرتبط بالمركز بالقطار، وقطار البراق السريع من طنجة." } },
+  Rabat: { climate: [17, 18, 20, 21, 23, 25, 27, 28, 27, 24, 21, 18], bestMonths: [5, 6, 9, 10], peakMonths: [7, 8], getThere: { fr: "Aéroport de Rabat-Salé ; train fréquent depuis Casablanca (environ 1 h) et TGV depuis Tanger.", en: "Rabat-Salé airport; frequent trains from Casablanca (about 1 h) and high-speed train from Tangier.", ar: "مطار الرباط سلا، وقطارات متكررة من الدار البيضاء (حوالي ساعة) والقطار السريع من طنجة." } },
+  Tangier: { climate: [16, 17, 18, 20, 23, 26, 29, 29, 27, 23, 19, 17], bestMonths: [5, 6, 9], peakMonths: [7, 8], getThere: { fr: "Aéroport Ibn Battouta ; ferry depuis l’Espagne ; TGV Al Boraq depuis Casablanca (environ 2 h 10).", en: "Ibn Battouta airport; ferry from Spain; Al Boraq high-speed train from Casablanca (about 2 h 10).", ar: "مطار ابن بطوطة، والعبّارة من إسبانيا، وقطار البراق من الدار البيضاء (حوالي ساعتين و10 دقائق)." } },
+  Chefchaouen: { climate: [14, 15, 18, 20, 24, 29, 33, 33, 28, 23, 18, 15], bestMonths: [4, 5, 9, 10], peakMonths: [4, 7, 8], getThere: { fr: "Pas de gare ni d’aéroport : bus ou grand taxi depuis Tanger, Tétouan ou Fès.", en: "No station or airport: bus or grand taxi from Tangier, Tetouan or Fez.", ar: "لا توجد محطة قطار ولا مطار: حافلة أو سيارة أجرة كبيرة من طنجة أو تطوان أو فاس." } },
+  Agadir: { climate: [20, 21, 22, 22, 23, 25, 26, 26, 26, 25, 23, 21], bestMonths: [3, 4, 5, 10, 11], peakMonths: [7, 8, 12], getThere: { fr: "Aéroport d’Agadir-Al Massira ; bus depuis Marrakech (environ 3 h) par l’autoroute.", en: "Agadir-Al Massira airport; bus from Marrakech (about 3 h) by motorway.", ar: "مطار أكادير المسيرة، وحافلة من مراكش (حوالي 3 ساعات) عبر الطريق السيار." } },
+  Essaouira: { climate: [18, 18, 19, 19, 20, 21, 22, 22, 22, 22, 20, 19], bestMonths: [5, 6, 9, 10], peakMonths: [7, 8], getThere: { fr: "Bus depuis Marrakech (environ 3 h) ou Agadir ; petit aéroport avec quelques vols.", en: "Bus from Marrakech (about 3 h) or Agadir; a small airport with a few flights.", ar: "حافلة من مراكش (حوالي 3 ساعات) أو أكادير، ومطار صغير برحلات قليلة." } },
+  Merzouga: { climate: [18, 21, 25, 29, 34, 39, 43, 42, 36, 30, 23, 18], bestMonths: [3, 4, 10, 11], peakMonths: [3, 4, 10, 12], getThere: { fr: "Bus de nuit depuis Fès ou Marrakech, ou route par Errachidia et Rissani ; comptez une journée.", en: "Night bus from Fez or Marrakech, or by road via Errachidia and Rissani; allow a full day.", ar: "حافلة ليلية من فاس أو مراكش، أو الطريق عبر الرشيدية والريصاني، وتستغرق الرحلة يومًا كاملًا." } },
+  Ouarzazate: { climate: [17, 20, 23, 27, 31, 36, 40, 39, 33, 27, 21, 17], bestMonths: [3, 4, 5, 10], peakMonths: [4, 10], getThere: { fr: "Bus depuis Marrakech par le col du Tizi n’Tichka (environ 4 h) ; petit aéroport.", en: "Bus from Marrakech over the Tizi n’Tichka pass (about 4 h); a small airport.", ar: "حافلة من مراكش عبر ممر تيزي نتيشكا (حوالي 4 ساعات)، ومطار صغير." } },
+  Meknes: { climate: [15, 17, 19, 21, 25, 30, 34, 34, 30, 25, 19, 16], bestMonths: [4, 5, 10], peakMonths: [4, 5], getThere: { fr: "Train depuis Fès (environ 40 min), Rabat et Casablanca.", en: "Train from Fez (about 40 min), Rabat and Casablanca.", ar: "القطار من فاس (حوالي 40 دقيقة) والرباط والدار البيضاء." } },
+  Tetouan: { climate: [16, 17, 18, 20, 23, 27, 30, 30, 27, 23, 19, 17], bestMonths: [5, 6, 9], peakMonths: [7, 8], getThere: { fr: "Bus ou grand taxi depuis Tanger (environ 1 h) ; petit aéroport de Tétouan-Sania Ramel.", en: "Bus or grand taxi from Tangier (about 1 h); small Tetouan-Sania Ramel airport.", ar: "حافلة أو سيارة أجرة كبيرة من طنجة (حوالي ساعة)، ومطار تطوان سانية الرمل الصغير." } },
+  Dakhla: { climate: [22, 23, 24, 24, 25, 26, 27, 28, 28, 27, 25, 23], bestMonths: [4, 5, 9, 10], peakMonths: [7, 8], getThere: { fr: "En avion depuis Casablanca ou Agadir ; la route depuis Agadir dépasse 1 000 km.", en: "By plane from Casablanca or Agadir; the road from Agadir is over 1,000 km.", ar: "بالطائرة من الدار البيضاء أو أكادير، والطريق من أكادير تتجاوز 1000 كلم." } },
+  Ifrane: { climate: [9, 11, 14, 16, 20, 26, 31, 31, 25, 19, 13, 10], bestMonths: [5, 6, 9], peakMonths: [1, 7, 8], getThere: { fr: "Bus ou grand taxi depuis Fès ou Meknès (environ 1 h).", en: "Bus or grand taxi from Fez or Meknes (about 1 h).", ar: "حافلة أو سيارة أجرة كبيرة من فاس أو مكناس (حوالي ساعة)." } },
+};
+const PEAK_FACTOR = 1.25;
+const GALLERY = {
+  'Marrakech': [
+    '/images/Marrakech-2.jpg',
+    '/images/Marrakech-3.jpg'
+  ],
+  'Fes': [
+    '/images/Fes-2.jpg',
+    '/images/Fes-3.jpg'
+  ],
+  'Casablanca': [
+    '/images/Casablanca-2.jpg'
+  ],
+  'Rabat': [
+    '/images/Rabat-2.jpg',
+    '/images/Rabat-3.jpg'
+  ],
+  'Tangier': [
+    '/images/Tangier-2.jpg'
+  ],
+  'Chefchaouen': [
+    '/images/Chefchaouen-2.jpg',
+    '/images/Chefchaouen-3.jpg'
+  ],
+  'Agadir': [
+    '/images/Agadir-2.jpg',
+    '/images/Agadir-3.jpg'
+  ],
+  'Essaouira': [
+    '/images/Essaouira-2.jpg'
+  ],
+  'Merzouga': [
+    '/images/Merzouga-2.jpg'
+  ],
+  'Ouarzazate': [
+    '/images/Ouarzazate-2.jpg',
+    '/images/Ouarzazate-3.jpg'
+  ],
+  'Meknes': [
+    '/images/Meknes-2.jpg'
+  ],
+  'Tetouan': [
+    '/images/Tetouan-2.jpg'
+  ],
+  'Dakhla': [
+    '/images/Dakhla-2.jpg',
+    '/images/Dakhla-3.jpg'
+  ]
+};
+DESTINATIONS.forEach((d) => { Object.assign(d, DETAILS[d.id]); d.gallery = [d.image, ...(GALLERY[d.id] ?? [])].filter(Boolean); });
+
 const byId = new Map(DESTINATIONS.map((d) => [d.id, d]));
 
-module.exports = { DESTINATIONS, findDestination: (id) => byId.get(id) };
+// Budget minimum conseillé par jour et par personne, selon le confort et le mois du voyage.
+function effectiveMinimum(destination, { comfort = 'budget', month = null } = {}) {
+  const { COMFORT } = require('./budgetCoach');
+  const peak = month !== null && destination.peakMonths.includes(month);
+  return { amount: Math.round(destination.minDailyBudget * COMFORT[comfort].factor * (peak ? PEAK_FACTOR : 1)), peak };
+}
+
+module.exports = { DESTINATIONS, findDestination: (id) => byId.get(id), effectiveMinimum };

@@ -4,20 +4,43 @@ import DestinationCard from './DestinationCard.jsx';
 import SearchBar from './SearchBar.jsx';
 import MapView from './MapView.jsx';
 
+// Compare deux noms sans tenir compte des accents ni des majuscules.
+const plain = (text) => text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
 export default function Home({ t, lang, user, destinations, favorites, toggleFavorite, search, setSearch, category, setCategory }) {
   const [view, setView] = useState('grid');
-  const visible = category ? destinations.filter((d) => d.types.includes(category)) : destinations;
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState('default');
+
+  let visible = category ? destinations.filter((d) => d.types.includes(category)) : destinations;
+  if (query.trim()) {
+    const q = plain(query.trim());
+    visible = visible.filter((d) => Object.values(d.name).some((name) => plain(name).includes(q)));
+  }
+  const sorters = {
+    priceAsc: (a, b) => a.minDailyBudget - b.minDailyBudget,
+    priceDesc: (a, b) => b.minDailyBudget - a.minDailyBudget,
+    name: (a, b) => a.name[lang].localeCompare(b.name[lang], lang),
+    rating: (a, b) => (b.rating.average ?? 0) - (a.rating.average ?? 0) || b.rating.count - a.rating.count,
+  };
+  if (sorters[sort]) visible = [...visible].sort(sorters[sort]);
 
   return (
     <>
       <section className="hero">
         <div className="hero-content">
-          <p className="hero-greeting">{t.greeting(user?.name)}</p>
+          <p className="hero-greeting">{t.greeting(user?.name.split(' ')[0])}</p>
           <h1>{t.heroTitle}</h1>
           <p className="hero-text">{t.heroText}</p>
           <SearchBar t={t} search={search} setSearch={setSearch} />
         </div>
       </section>
+
+      <div className="shortcuts">
+        <a className="shortcut" href="#/quiz"><span aria-hidden="true">✨</span> {t.quizTab}</a>
+        <a className="shortcut" href="#/circuit"><span aria-hidden="true">🗺️</span> {t.circuitTab}</a>
+        <a className="shortcut" href="#/compare"><span aria-hidden="true">⚖️</span> {t.compareTab}</a>
+      </div>
 
       <nav className="categories" aria-label={t.tripType}>
         {[null, ...TRIP_TYPES].map((type) => (
@@ -43,7 +66,10 @@ export default function Home({ t, lang, user, destinations, favorites, toggleFav
           <h2 className="home-title">{t.gridTitle}</h2>
         )}
         <div className="list-tools">
-          <a className="btn-small" href="#/compare">{t.compareTab}</a>
+          <input className="tool-input" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t.searchCity} aria-label={t.searchCity} />
+          <select className="tool-input" value={sort} onChange={(e) => setSort(e.target.value)} aria-label={t.sortLabel}>
+            {Object.entries(t.sorts).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+          </select>
           <div className="toggle" role="group">
             <button className={view === 'grid' ? 'active' : ''} aria-pressed={view === 'grid'} onClick={() => setView('grid')}>{t.viewGrid}</button>
             <button className={view === 'map' ? 'active' : ''} aria-pressed={view === 'map'} onClick={() => setView('map')}>{t.viewMap}</button>
@@ -52,7 +78,7 @@ export default function Home({ t, lang, user, destinations, favorites, toggleFav
       </div>
 
       {visible.length === 0 ? (
-        <p className="muted">{t.noResults}</p>
+        <p className="muted">{query.trim() ? t.noMatch : t.noResults}</p>
       ) : view === 'map' ? (
         <MapView t={t} lang={lang} destinations={visible} />
       ) : (

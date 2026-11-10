@@ -1,23 +1,22 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { TYPE_ICONS, errorText, formatMoney } from '../i18n.js';
-import BudgetCoach from './BudgetCoach.jsx';
 import Cover from './Cover.jsx';
-import { HeartButton } from './DestinationCard.jsx';
-import Itinerary from './Itinerary.jsx';
+import { HeartButton, Rating } from './DestinationCard.jsx';
+import PlanResult from './PlanResult.jsx';
+import TripFields, { tripDefaults, tripPayload } from './TripFields.jsx';
+import Climate from './Climate.jsx';
+import Guide from './Guide.jsx';
+import Reviews from './Reviews.jsx';
 
-export default function CityPage({ t, lang, destination, favorites, toggleFavorite, search, category, user, requireAuth }) {
+export default function CityPage({ t, lang, destination, favorites, toggleFavorite, search, category, user, requireAuth, onReviewed }) {
   const d = destination;
-  const [form, setForm] = useState(() => ({
-    tripType: d?.types.includes(category) ? category : d?.types[0],
-    budget: search ? String(search.budget) : '',
-    days: String(search?.days ?? 5),
-    people: String(search?.people ?? 2),
-  }));
-  const [plan, setPlan] = useState(null); // { trip, coach, itinerary }
-  const [saved, setSaved] = useState(false);
+  const [form, setForm] = useState(() => ({ ...tripDefaults(search), tripType: d?.types.includes(category) ? category : d?.types[0] }));
+  const [plan, setPlan] = useState(null); // { trip, budgetCoach, itinerary, minimum }
+  const [savedId, setSavedId] = useState(null);
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [photo, setPhoto] = useState(0);
 
   async function run(action) {
     setBusy(true);
@@ -31,12 +30,11 @@ export default function CityPage({ t, lang, destination, favorites, toggleFavori
     }
   }
 
-  function generate(values = form) {
-    const trip = { destination: d.id, tripType: values.tripType, budget: Number(values.budget), days: Number(values.days), people: Number(values.people) };
+  function generate() {
+    const trip = { ...tripPayload(form), destination: d.id, days: Number(form.days) };
     return run(async () => {
-      const { budgetCoach, itinerary } = await api.budgetCoach(trip);
-      setPlan({ trip, coach: budgetCoach, itinerary });
-      setSaved(false);
+      setPlan({ trip, ...(await api.plan(trip)) });
+      setSavedId(null);
     });
   }
 
@@ -48,13 +46,11 @@ export default function CityPage({ t, lang, destination, favorites, toggleFavori
 
   if (!d) return <p className="error" role="alert">{errorText(t, 'destination_not_found')}</p>;
 
-  const set = (field) => (e) => setForm({ ...form, [field]: e.target.value });
-
   function save() {
     if (!user) { requireAuth(); return; }
     run(async () => {
-      await api.saveTrip(plan.trip);
-      setSaved(true);
+      const { trip } = await api.saveTrip(plan.trip);
+      setSavedId(trip.id);
     });
   }
 
@@ -62,10 +58,23 @@ export default function CityPage({ t, lang, destination, favorites, toggleFavori
     <article>
       <a className="btn-link back" href="#/"><span className="arrow" aria-hidden="true">←</span> {t.back}</a>
       <div className="city-head">
-        <h1>{d.name[lang]}</h1>
+        <div>
+          <h1>{d.name[lang]}</h1>
+          <Rating t={t} rating={d.rating} />
+        </div>
         <HeartButton t={t} active={favorites.includes(d.id)} onClick={() => toggleFavorite(d.id)} className="outlined" />
       </div>
-      <Cover destination={d} className="city-cover" />
+
+      <Cover destination={{ ...d, image: d.gallery[photo] ?? d.image }} className="city-cover" />
+      {d.gallery.length > 1 && (
+        <div className="thumbs" role="group" aria-label={t.photosOf(d.name[lang])}>
+          {d.gallery.map((src, i) => (
+            <button key={src} className={i === photo ? 'thumb active' : 'thumb'} aria-pressed={i === photo} aria-label={`${i + 1} / ${d.gallery.length}`} onClick={() => setPhoto(i)}>
+              <img src={src} alt="" loading="lazy" />
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="city-layout">
         <div className="city-main">
@@ -89,14 +98,9 @@ export default function CityPage({ t, lang, destination, favorites, toggleFavori
           <h2>{t.coachTitle}</h2>
           {plan ? (
             <>
-              {plan.coach.perDayPerPerson < d.minDailyBudget && (
-                <p className="warning" role="status">{t.belowMinimum(formatMoney(d.minDailyBudget, lang))}</p>
-              )}
-              <BudgetCoach t={t} lang={lang} coach={plan.coach} />
-              <h2 className="section-gap">{t.itineraryTitle}</h2>
-              <Itinerary t={t} lang={lang} itinerary={plan.itinerary} />
-              {saved ? (
-                <p className="success" role="status">✓ {t.saved}</p>
+              <PlanResult t={t} lang={lang} plan={plan} destinations={[d]} />
+              {savedId ? (
+                <p className="success" role="status">✓ {t.saved} <a href={`#/trip/${savedId}`}>{t.openTrip}</a></p>
               ) : (
                 <button className="btn-secondary" onClick={save} disabled={busy}>{t.save}</button>
               )}
@@ -104,43 +108,19 @@ export default function CityPage({ t, lang, destination, favorites, toggleFavori
           ) : (
             <p className="muted">{t.coachEmpty}</p>
           )}
+
+          <hr />
+          <Climate t={t} destination={d} />
+          <hr />
+          <Guide t={t} lang={lang} destination={d} />
+          <hr />
+          <Reviews t={t} lang={lang} destination={d} user={user} requireAuth={requireAuth} onChanged={onReviewed} />
         </div>
 
         <aside>
           <form className="card plan-card" onSubmit={(e) => { e.preventDefault(); generate(); }}>
             <h2>{t.planTitle}</h2>
-            <fieldset className="field">
-              <legend>{t.tripType}</legend>
-              <div className="chips">
-                {d.types.map((type) => (
-                  <button
-                    type="button"
-                    key={type}
-                    className={form.tripType === type ? 'chip active' : 'chip'}
-                    aria-pressed={form.tripType === type}
-                    onClick={() => setForm({ ...form, tripType: type })}
-                  >
-                    {t.types[type]}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-            <div className="input-group">
-              <label>
-                <span>{t.budget}</span>
-                <input type="number" min="1" step="any" inputMode="decimal" required value={form.budget} onChange={set('budget')} />
-              </label>
-              <div className="input-group-row">
-                <label>
-                  <span>{t.days}</span>
-                  <input type="number" min="1" max="365" step="1" required value={form.days} onChange={set('days')} />
-                </label>
-                <label>
-                  <span>{t.people}</span>
-                  <input type="number" min="1" max="50" step="1" required value={form.people} onChange={set('people')} />
-                </label>
-              </div>
-            </div>
+            <TripFields t={t} form={form} setForm={setForm} types={d.types} />
             {error && <p className="error" role="alert">{errorText(t, error)}</p>}
             <button className="btn-primary" disabled={busy}>{t.generate}</button>
           </form>

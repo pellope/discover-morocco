@@ -1,27 +1,39 @@
 import { useEffect, useState } from 'react';
 import { api, getToken, setToken } from './api.js';
-import { getT, errorText } from './i18n.js';
+import { getT, errorText, setCurrency } from './i18n.js';
 import Header from './components/Header.jsx';
+import Footer from './components/Footer.jsx';
 import AuthModal from './components/AuthModal.jsx';
 import Home from './components/Home.jsx';
 import CityPage from './components/CityPage.jsx';
+import CircuitPage from './components/CircuitPage.jsx';
 import MyTrips from './components/MyTrips.jsx';
+import TripPage from './components/TripPage.jsx';
 import Favorites from './components/Favorites.jsx';
-import Credits from './components/Credits.jsx';
 import Compare from './components/Compare.jsx';
+import Quiz from './components/Quiz.jsx';
+import Profile from './components/Profile.jsx';
 import SharedTrip from './components/SharedTrip.jsx';
-import Footer from './components/Footer.jsx';
+import Credits from './components/Credits.jsx';
 
-const LANG_KEY = 'dm_lang';
+const stored = (key, fallback) => {
+  try { return localStorage.getItem(key) || fallback; } catch { return fallback; }
+};
+const prefersDark = () => window.matchMedia?.('(prefers-color-scheme: dark)').matches;
 
-// Navigation par l'adresse : #/ , #/city/Fes , #/trips , #/favorites
+// Navigation par l'adresse : #/ , #/city/Fes , #/trip/12 , #/shared/<jeton> …
 function parseRoute() {
   const [page = '', id] = window.location.hash.replace(/^#\/?/, '').split('/');
   return { page: page || 'home', id: id ? decodeURIComponent(id) : null };
 }
 
+const ACCOUNT_PAGES = ['trips', 'trip', 'favorites', 'profile'];
+
 export default function App() {
-  const [lang, setLang] = useState(() => localStorage.getItem(LANG_KEY) || 'fr');
+  const [lang, setLang] = useState(() => stored('dm_lang', 'fr'));
+  const [theme, setTheme] = useState(() => stored('dm_theme', prefersDark() ? 'dark' : 'light'));
+  const [currency, setCurrencyState] = useState(() => stored('dm_currency', 'MAD'));
+  const [config, setConfig] = useState(null);
   const [route, setRoute] = useState(parseRoute);
   const [user, setUser] = useState(null);
   const [checking, setChecking] = useState(() => Boolean(getToken()));
@@ -33,17 +45,29 @@ export default function App() {
   const [authOpen, setAuthOpen] = useState(false);
   const t = getT(lang);
 
+  // La devise est appliquée avant l'affichage : tous les montants passent par formatMoney.
+  setCurrency(currency, config?.rates);
+
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-    localStorage.setItem(LANG_KEY, lang);
+    localStorage.setItem('dm_lang', lang);
   }, [lang]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('dm_theme', theme);
+  }, [theme]);
+
+  useEffect(() => { localStorage.setItem('dm_currency', currency); }, [currency]);
 
   useEffect(() => {
     const onHashChange = () => { setRoute(parseRoute()); window.scrollTo(0, 0); };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
+
+  useEffect(() => { api.config().then(setConfig).catch(() => {}); }, []);
 
   // Au chargement, retrouver l'utilisateur à partir du jeton enregistré.
   useEffect(() => {
@@ -60,13 +84,14 @@ export default function App() {
   }, [user]);
 
   // La liste des destinations vient du serveur, triée selon la recherche en cours.
+  const [reloadKey, setReloadKey] = useState(0);
   useEffect(() => {
     let cancelled = false;
     api.destinations(search ?? {})
       .then(({ destinations: list }) => { if (!cancelled) { setDestinations(list); setLoadError(null); } })
       .catch((err) => { if (!cancelled) setLoadError(err.code); });
     return () => { cancelled = true; };
-  }, [search]);
+  }, [search, reloadKey]);
 
   function changeLanguage(code) {
     setLang(code);
@@ -95,7 +120,8 @@ export default function App() {
   }
 
   const shared = { t, lang, favorites, toggleFavorite };
-  const needsAccount = (route.page === 'trips' || route.page === 'favorites') && !user;
+  const planning = { t, lang, user, search, requireAuth: () => setAuthOpen(true) };
+  const needsAccount = ACCOUNT_PAGES.includes(route.page) && !user;
 
   let page;
   if (checking) {
@@ -116,19 +142,26 @@ export default function App() {
       <CityPage
         key={route.id}
         {...shared}
+        {...planning}
         destination={destinations.find((d) => d.id === route.id)}
-        search={search}
         category={category}
-        user={user}
-        requireAuth={() => setAuthOpen(true)}
+        onReviewed={() => setReloadKey((k) => k + 1)}
       />
     );
+  } else if (route.page === 'circuit') {
+    page = <CircuitPage {...planning} destinations={destinations} />;
   } else if (route.page === 'trips') {
     page = <MyTrips t={t} lang={lang} destinations={destinations} />;
+  } else if (route.page === 'trip') {
+    page = <TripPage key={route.id} t={t} lang={lang} id={route.id} destinations={destinations} />;
   } else if (route.page === 'favorites') {
     page = <Favorites {...shared} destinations={destinations} />;
   } else if (route.page === 'compare') {
     page = <Compare t={t} lang={lang} destinations={destinations} search={search} />;
+  } else if (route.page === 'quiz') {
+    page = <Quiz {...shared} destinations={destinations} />;
+  } else if (route.page === 'profile') {
+    page = <Profile t={t} user={user} setUser={setUser} logout={logout} />;
   } else if (route.page === 'shared') {
     page = <SharedTrip key={route.id} t={t} lang={lang} token={route.id} destinations={destinations} />;
   } else if (route.page === 'credits') {
@@ -143,13 +176,19 @@ export default function App() {
         t={t}
         lang={lang}
         user={user}
+        theme={theme}
+        toggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        currency={currency}
+        setCurrency={setCurrencyState}
         changeLanguage={changeLanguage}
         openAuth={() => setAuthOpen(true)}
         logout={logout}
       />
       <main className="main">{page}</main>
       <Footer t={t} />
-      {authOpen && <AuthModal t={t} lang={lang} onAuthenticated={onAuthenticated} onClose={() => setAuthOpen(false)} />}
+      {authOpen && (
+        <AuthModal t={t} lang={lang} googleClientId={config?.googleClientId} onAuthenticated={onAuthenticated} onClose={() => setAuthOpen(false)} />
+      )}
     </>
   );
 }

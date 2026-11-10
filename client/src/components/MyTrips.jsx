@@ -1,50 +1,9 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { errorText, formatMoney } from '../i18n.js';
+import { errorText } from '../i18n.js';
 import BudgetCoach from './BudgetCoach.jsx';
 import Cover from './Cover.jsx';
-import Itinerary from './Itinerary.jsx';
-
-function TripCard({ t, lang, trip, destination: d, onDelete }) {
-  const [open, setOpen] = useState(false);
-  const [shared, setShared] = useState(null); // 'copied' ou 'manual'
-  const link = `${window.location.origin}${window.location.pathname}#/shared/${trip.shareToken}`;
-
-  async function share() {
-    try {
-      await navigator.clipboard.writeText(link);
-      setShared('copied');
-    } catch {
-      setShared('manual'); // presse-papiers indisponible : on affiche le lien à copier
-    }
-  }
-
-  return (
-    <article className="card trip-card">
-      {d && <Cover destination={d} className="trip-cover" />}
-      <div className="trip-body">
-        <h3>{d ? <a href={`#/city/${d.id}`}>{d.name[lang]}</a> : trip.destination}</h3>
-        <p className="muted">
-          {t.types[trip.tripType]} · {t.daysCount(trip.days)} · {t.peopleCount(trip.people)} · {formatMoney(trip.budget, lang)}
-        </p>
-        <BudgetCoach t={t} lang={lang} coach={trip.budgetCoach} compact />
-        <div className="trip-actions">
-          <button className="btn-small" onClick={() => setOpen(!open)} aria-expanded={open}>{open ? t.hidePlan : t.showPlan}</button>
-          <button className="btn-small" onClick={share}>{t.share}</button>
-          <button className="btn-small danger" onClick={onDelete}>{t.delete}</button>
-        </div>
-        {shared === 'copied' && <p className="success small" role="status">{t.linkCopied}</p>}
-        {shared === 'manual' && (
-          <label className="share-link">
-            <span className="muted">{t.copyLink}</span>
-            <input readOnly value={link} dir="ltr" onFocus={(e) => e.target.select()} />
-          </label>
-        )}
-        {open && <Itinerary t={t} lang={lang} itinerary={trip.itinerary} />}
-      </div>
-    </article>
-  );
-}
+import { tripSummary, tripTitle } from './TripPage.jsx';
 
 export default function MyTrips({ t, lang, destinations }) {
   const [trips, setTrips] = useState(null);
@@ -79,16 +38,23 @@ export default function MyTrips({ t, lang, destinations }) {
         </div>
       ) : (
         <div className="trip-grid">
-          {trips.map((trip) => (
-            <TripCard
-              key={trip.id}
-              t={t}
-              lang={lang}
-              trip={trip}
-              destination={destinations.find((item) => item.id === trip.destination)}
-              onDelete={() => remove(trip.id)}
-            />
-          ))}
+          {trips.map((trip) => {
+            const cover = destinations.find((d) => d.id === trip.destination);
+            return (
+              <article className="card trip-card" key={trip.id}>
+                {cover && <Cover destination={cover} className="trip-cover" />}
+                <div className="trip-body">
+                  <h3><a href={`#/trip/${trip.id}`}>{tripTitle(trip, destinations, lang)}</a></h3>
+                  <p className="muted">{tripSummary(trip, t, lang)}</p>
+                  <BudgetCoach t={t} lang={lang} coach={trip.budgetCoach} compact />
+                  <div className="trip-actions">
+                    <a className="btn-small primary" href={`#/trip/${trip.id}`}>{t.openTrip}</a>
+                    <button className="btn-small danger" onClick={() => remove(trip.id)}>{t.delete}</button>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
         </div>
       )}
     </>
