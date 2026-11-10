@@ -1,6 +1,12 @@
 // Textes des fonctions ajoutées ensuite (confort, circuit, dépenses, quiz, profil, avis, météo, guide…).
 export const EXTRA = {
   fr: {
+    placesTitle: 'À voir, à goûter',
+    placeCats: { monument: 'Monuments et musées', food: 'Cafés et restaurants', market: 'Souks et marchés', nature: 'Nature et détente' },
+    placesNote: 'Prix estimés par personne. Les adresses et les tarifs peuvent changer : vérifiez avant de vous déplacer.',
+    perPersonShort: '/ pers.',
+    addPlace: 'Ajouter un lieu de la ville…',
+    placesCount: (n) => `${n} lieux`,
     currency: 'Devise',
     themeDark: 'Passer en mode sombre',
     themeLight: 'Passer en mode clair',
@@ -130,6 +136,12 @@ export const EXTRA = {
     },
   },
   en: {
+    placesTitle: 'See and taste',
+    placeCats: { monument: 'Monuments and museums', food: 'Cafés and restaurants', market: 'Souks and markets', nature: 'Nature and relaxation' },
+    placesNote: 'Estimated prices per person. Addresses and prices can change: check before you go.',
+    perPersonShort: '/ person',
+    addPlace: 'Add a place in this city…',
+    placesCount: (n) => `${n} places`,
     currency: 'Currency',
     themeDark: 'Switch to dark mode',
     themeLight: 'Switch to light mode',
@@ -259,6 +271,12 @@ export const EXTRA = {
     },
   },
   ar: {
+    placesTitle: 'ما تراه وما تتذوقه',
+    placeCats: { monument: 'معالم ومتاحف', food: 'مقاهٍ ومطاعم', market: 'أسواق', nature: 'طبيعة واسترخاء' },
+    placesNote: 'أسعار تقديرية للشخص الواحد. العناوين والأثمنة قد تتغير، فتحقق قبل التنقل.',
+    perPersonShort: '/ شخص',
+    addPlace: 'أضف مكانًا من المدينة…',
+    placesCount: (n) => `${n} مكانًا`,
     currency: 'العملة',
     themeDark: 'الوضع الداكن',
     themeLight: 'الوضع الفاتح',

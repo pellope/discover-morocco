@@ -359,3 +359,19 @@ test('public config exposes exchange rates and the Google client id', async () =
   assert.ok(body.rates.EUR > 5 && body.rates.USD > 5);
   assert.equal(body.googleClientId, 'test-client-id');
 });
+
+test('places: every city has places in the four categories, with three languages', async () => {
+  const all = await call('GET', '/destinations');
+  for (const d of all.body.destinations) {
+    const { body } = await call('GET', `/destinations/${d.id}/places`);
+    assert.ok(body.places.length >= 8, d.id);
+    assert.equal(new Set(body.places.map((p) => p.id)).size, body.places.length, d.id);
+    for (const place of body.places) {
+      assert.ok(['monument', 'food', 'market', 'nature'].includes(place.category), place.id);
+      assert.ok(place.name.fr && place.name.en && place.name.ar, place.id);
+      assert.ok(place.description.fr && place.description.en && place.description.ar, place.id);
+      assert.ok(Number.isFinite(place.cost) && place.cost >= 0, place.id);
+    }
+  }
+  assert.equal((await call('GET', '/destinations/Paris/places')).status, 404);
+});

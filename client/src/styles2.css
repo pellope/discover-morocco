@@ -189,3 +189,27 @@ span.star { font-size: 1rem; }
   .trip-sections > * { margin-bottom: 16px; }
   .bar-fill, .day-badge, .level { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+/* ---------- Lieux à voir et à goûter ---------- */
+.place-tabs { margin: 4px 0 20px; }
+.chip-count { opacity: 0.65; font-size: 0.85em; }
+.places { list-style: none; margin: 0 0 16px; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px 16px; }
+.place { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+.place-cover { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+.place-pattern { display: grid; place-items: center; background-image: var(--zellige); font-size: 2.2rem; }
+.place-monument { background-color: var(--accent-soft); }
+.place-food { background-color: var(--saffron-soft); }
+.place-market { background-color: var(--sand); }
+.place-nature { background-color: #e3f4ec; }
+[data-theme='dark'] .place-nature { background-color: #143a2c; }
+.place-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.place-body h3 { margin: 0; font-size: 1.02rem; }
+.place-body p { margin: 0; }
+.place-body .price { margin-top: auto; padding-top: 8px; }
+.place-cat { font-size: 0.72rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.03em; }
+[dir='rtl'] .place-cat { letter-spacing: 0; }
+.add-place { flex: 1 1 100%; min-width: 0; padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 999px; background: var(--surface); }
+@media (max-width: 640px) {
+  .places { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 10px; }
+  .place-body { padding: 10px 12px 12px; }
+}

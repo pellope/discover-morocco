@@ -8,6 +8,8 @@ export const LANGUAGES = [
 
 export const TRIP_TYPES = ['culture', 'beach', 'desert', 'adventure', 'gastronomy'];
 
+export const PLACE_ICONS = { monument: '🕌', food: '🍵', market: '🧺', nature: '🌿' };
+
 export const TYPE_ICONS = { custom: '📌', all: '🧭', culture: '🕌', beach: '🏖️', desert: '🏜️', adventure: '⛰️', gastronomy: '🍲' };
 
 const translations = {

@@ -2,6 +2,7 @@ const express = require('express');
 const { DESTINATIONS, findDestination, effectiveMinimum } = require('../destinations');
 const { TRIP_TYPES, COMFORT_LEVELS } = require('../budgetCoach');
 const { HttpError, validateReview } = require('../validation');
+const { PLACES } = require('../places');
 
 function destinationsRouter(db, auth) {
   const router = express.Router();
@@ -55,6 +56,11 @@ function destinationsRouter(db, auth) {
   router.get('/:id', (req, res) => {
     const destination = known(req);
     res.json({ destination: { ...destination, rating: ratings().get(destination.id) ?? { average: null, count: 0 } } });
+  });
+
+  // Lieux à voir et à goûter dans la ville.
+  router.get('/:id/places', (req, res) => {
+    res.json({ places: PLACES[known(req).id] ?? [] });
   });
 
   // Avis des voyageurs : lecture publique, un avis par personne et par ville.

@@ -38,6 +38,8 @@ npm test
 
 **Découvrir**
 - 14 destinations avec photos, galerie, note des voyageurs, météo par mois et guide pratique.
+- « À voir, à goûter » : monuments et musées, cafés et restaurants, souks et marchés, nature et détente
+  dans chaque ville ; un lieu s'ajoute au plan d'un voyage sauvegardé.
 - Recherche par budget (les villes qui rentrent dans le budget passent en premier), par nom, tri, filtres par type de voyage.
 - Carte du Maroc, comparaison de deux villes, quiz « quelle ville est faite pour vous ? ».
 
@@ -65,11 +67,12 @@ npm test
 |---|---|
 | Villes, budgets minimums, climat, accès, conseils | `server/src/destinations.js` |
 | Activités et leurs prix | `server/src/activities.js` |
+| Lieux à voir et à goûter (170 lieux, 4 catégories) | `server/src/places.js` |
 | Seuils, répartition et niveaux de confort du Budget Coach | `server/src/budgetCoach.js` |
 | Taux de change (approximatifs) | `server/src/app.js` |
 | Liste de bagages | `server/src/packing.js` |
 | Textes de l'interface | `client/src/i18n.js` et `client/src/i18n2.js` |
-| Photos et crédits | `client/public/images/` et `client/src/photoCredits.js` |
+| Photos et crédits | `client/public/images/`, `client/src/photoCredits.js` et `client/src/placeCredits.js` |
 
 Les budgets, prix, températures et taux sont des estimations saisies à la main, en attendant une source de
 données réelle (API Google Places). Les photos viennent de Wikimedia Commons, sous licences libres ; leurs

@@ -21,10 +21,20 @@ export default function TripPage({ t, lang, id, destinations }) {
   const [error, setError] = useState(null);
   const [editing, setEditing] = useState(false);
   const [shared, setShared] = useState(null); // 'copied' ou 'manual'
+  const [placesByCity, setPlacesByCity] = useState({});
 
   useEffect(() => {
     api.getTrip(id).then(({ trip: found }) => setTrip(found)).catch((err) => setError(err.code));
   }, [id]);
+
+  // Les lieux de chaque ville du voyage, proposés quand on modifie le plan.
+  const cities = trip ? [...new Set(trip.stops.map((stop) => stop.destination))].join(',') : '';
+  useEffect(() => {
+    if (!cities) return;
+    Promise.all(cities.split(',').map((city) => api.places(city).then(({ places }) => [city, places])))
+      .then((entries) => setPlacesByCity(Object.fromEntries(entries)))
+      .catch(() => {});
+  }, [cities]);
 
   if (error && !trip) {
     return (
@@ -87,7 +97,7 @@ export default function TripPage({ t, lang, id, destinations }) {
         <section className="card">
           <h2>{t.coachTitle}</h2>
           {error && <p className="error" role="alert">{errorText(t, error)}</p>}
-          <PlanResult t={t} lang={lang} plan={trip} destinations={destinations} onPlanChange={editing ? savePlan : undefined}>
+          <PlanResult t={t} lang={lang} plan={trip} destinations={destinations} onPlanChange={editing ? savePlan : undefined} placesByCity={placesByCity} people={trip.people}>
             <span className="trip-actions no-print">
               {trip.itinerary.custom && <span className="badge static badge-fits">{t.customPlanNote}</span>}
               {editing && trip.itinerary.custom && <button className="btn-small" onClick={() => savePlan(null)}>{t.resetPlan}</button>}

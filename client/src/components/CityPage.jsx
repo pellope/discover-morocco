@@ -8,6 +8,7 @@ import TripFields, { tripDefaults, tripPayload } from './TripFields.jsx';
 import Climate from './Climate.jsx';
 import Guide from './Guide.jsx';
 import Reviews from './Reviews.jsx';
+import Places from './Places.jsx';
 
 export default function CityPage({ t, lang, destination, favorites, toggleFavorite, search, category, user, requireAuth, onReviewed }) {
   const d = destination;
@@ -109,6 +110,8 @@ export default function CityPage({ t, lang, destination, favorites, toggleFavori
             <p className="muted">{t.coachEmpty}</p>
           )}
 
+          <hr />
+          <Places t={t} lang={lang} destination={d} />
           <hr />
           <Climate t={t} destination={d} />
           <hr />

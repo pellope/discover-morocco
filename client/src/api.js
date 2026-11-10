@@ -53,6 +53,7 @@ export const api = {
   changePassword: (currentPassword, newPassword) => request('POST', '/auth/password', { currentPassword, newPassword }),
   deleteAccount: (password) => request('DELETE', '/auth/me', { password }),
   destinations: (params = {}) => request('GET', '/destinations' + query(params)),
+  places: (id) => request('GET', '/destinations/' + id + '/places'),
   reviews: (id) => request('GET', '/destinations/' + id + '/reviews'),
   saveReview: (id, body) => request('PUT', '/destinations/' + id + '/review', body),
   deleteReview: (id) => request('DELETE', '/destinations/' + id + '/review'),

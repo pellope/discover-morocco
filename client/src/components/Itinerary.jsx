@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { TYPE_ICONS, activityName, formatDate, formatMoney } from '../i18n.js';
 
-// Formulaire d'ajout d'une activité à un jour (mode modification).
-function AddActivity({ t, onAdd }) {
+// Type de voyage correspondant à chaque catégorie de lieu (pour l'icône dans le plan).
+const PLACE_TYPES = { monument: 'culture', food: 'gastronomy', market: 'culture', nature: 'adventure' };
+
+// Formulaire d'ajout d'une activité à un jour (mode modification) : un lieu de la ville ou un texte libre.
+function AddActivity({ t, lang, onAdd, places, people }) {
   const [name, setName] = useState('');
   const [cost, setCost] = useState('');
   function submit(e) {
@@ -14,6 +17,20 @@ function AddActivity({ t, onAdd }) {
   }
   return (
     <form className="add-activity" onSubmit={submit}>
+      {places?.length > 0 && (
+        <select
+          className="add-place"
+          value=""
+          aria-label={t.addPlace}
+          onChange={(e) => {
+            const place = places.find((p) => p.id === e.target.value);
+            if (place) onAdd({ name: place.name, type: PLACE_TYPES[place.category], cost: place.cost * people });
+          }}
+        >
+          <option value="">{t.addPlace}</option>
+          {places.map((p) => <option key={p.id} value={p.id}>{p.name[lang]}</option>)}
+        </select>
+      )}
       <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t.activityName} aria-label={t.activityName} maxLength={120} />
       <input type="number" min="0" step="any" value={cost} onChange={(e) => setCost(e.target.value)} placeholder={t.activityCost} aria-label={t.activityCost} />
       <button className="btn-small">{t.addActivity}</button>
@@ -23,7 +40,7 @@ function AddActivity({ t, onAdd }) {
 
 // Plan jour par jour calculé par le serveur. Avec onChange, chaque activité peut être
 // déplacée au jour précédent ou suivant, retirée, et on peut en ajouter.
-export default function Itinerary({ t, lang, itinerary, destinations, onChange }) {
+export default function Itinerary({ t, lang, itinerary, destinations, onChange, placesByCity, people = 1 }) {
   const cityName = (id) => destinations?.find((d) => d.id === id)?.name[lang] ?? id;
   const multiCity = new Set(itinerary.days.map((d) => d.destination)).size > 1;
   const editing = Boolean(onChange);
@@ -92,7 +109,7 @@ export default function Itinerary({ t, lang, itinerary, destinations, onChange }
                 ))}
               </ul>
             )}
-            {editing && <AddActivity t={t} onAdd={(activity) => add(dayIndex, activity)} />}
+            {editing && <AddActivity t={t} lang={lang} places={placesByCity?.[day.destination]} people={people} onAdd={(activity) => add(dayIndex, activity)} />}
             <p className="muted day-total">{t.dayEstimate} : <strong>{formatMoney(day.total, lang)}</strong></p>
           </li>
         ))}

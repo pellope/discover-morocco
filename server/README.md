@@ -23,6 +23,7 @@ Les erreurs ont la forme `{ "error": { "code": "...", "message": "..." } }` ; l'
 |---|---|---|
 | GET | `/api/destinations` | Liste ; `?type=`, `?budget=&days=&people=` (ajoute `fits` et trie), `?comfort=`, `?month=` |
 | GET | `/api/destinations/:id` | Une destination |
+| GET | `/api/destinations/:id/places` | Lieux à voir et à goûter dans la ville |
 | GET | `/api/destinations/:id/reviews` | Avis et note moyenne |
 | PUT / DELETE | `/api/destinations/:id/review` 🔒 | Publier `{ rating, comment? }` ou supprimer son avis |
 | GET | `/api/favorites` 🔒 | Identifiants des destinations favorites |
